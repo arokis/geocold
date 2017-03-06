@@ -9,7 +9,10 @@ import rdflib
 
 from flask import Flask, request
 from flask import make_response
+from flask_cors import CORS
 app = Flask(__name__)
+CORS(app)
+
 
 
 
@@ -54,6 +57,7 @@ def http_lookup(url, headers, mapping_dict):
 
 
 @app.route("/lookup", methods=['GET', 'POST'])
+#@crossdomain(origin='*')
 def lookup():
     if request.method == 'POST':
 
