@@ -1,38 +1,12 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
-	<head>
-		<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
-		
-		<style type="text/css">
-html,body{
-	margin:0px;
-	width: 100%;
-	height:100%;
-}
-#map{
-/* width:400px;
-height:300px; */
-width:100%;
-height:100%;
-}
-
-	
-</style>
-		<script type="text/javascript" src="http://maplib.khtml.org/maplib/newest/khtml_all.js"> </script>
-		<script type="text/javascript" src="http://maplib.khtml.org/maplib/newest/js/overlay/Marker.js"> </script>
-		
-		<script type="text/javascript">
-
 var mr=new Object(khtml.maplib);
 var map;
 
 
-function init(){
+function initGeoCoLD(){
 	map=new mr.Map(document.getElementById("map"));  //dom element
 	
 	var center=new mr.LatLng(0,0);  //latitude, longitude
-	map.centerAndZoom(new mr.LatLng(27, 74),1.5); //1.5 = zoomlevel
-	
+	map.centerAndZoom(new mr.LatLng(35, 25),2.3); //1.5 = zoomlevel
 	
 	// define position
 	var point = new mr.LatLng(50.875311, 0.351563);
@@ -51,6 +25,7 @@ function init(){
 	  {x:10,y:20}
 	);
 	
+    /*
 		// static marker on Mt. Uluru/Australia
 	var myLatlng = new mr.LatLng(51.61667,9.93333);
 	var marker2 = new mr.overlay.Marker({
@@ -58,6 +33,7 @@ function init(){
         map: map,
         title:"static marker on Mt. Uluru/Australia"
     });
+    */
     
     		// Test
 	var myLatlng = new mr.LatLng(-20.363882,20.044922);
@@ -152,15 +128,26 @@ let test = function() {
 		});
 }
 
+let plottResponse = function (list) {
+    for ($i = 0; $i < list.length; $i++){
+        let geo_mark = list[$i]
+        setMarker(geo_mark);
+    };
+}
 
-console.log(myLatlng)
-
-</script>
-		
-		<title>Markers</title>
-	</head>
-	<body onload="init()"> 
-		<div id="map"></div>
-		<div><button onclick="test()">test</button></div>
-	</body>
-</html>
+let setMarker = function (place) {
+        let label = place['label']
+        let long = place['coordinates']['long']
+        let lat = place['coordinates']['lat']
+        /*
+        console.log('Label: ' + place['label'])
+        console.log('Long.: ' + place['coordinates']['long'])
+        console.log('Lat. : ' + place['coordinates']['lat'])
+        */
+        var myLatlng = new mr.LatLng(long,lat);
+		var marker2 = new mr.overlay.Marker({
+			position: myLatlng, 
+			map: map,
+			title:label
+		});
+}
