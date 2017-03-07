@@ -1,0 +1,137 @@
+<?xml version='1.0'?>
+<rdf:RDF
+    xmlns:gn="http://www.geonames.org/ontology#"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:crm="http://erlangen-crm.org/current/"
+    xmlns:owl="http://www.w3.org/2002/07/owl#"
+    xmlns:schema="http://schema.org/"
+    xmlns:dcterms="http://purl.org/dc/terms/"
+    xmlns:gndo="http://d-nb.info/standards/elementset/gnd#"
+    xmlns:foaf="http://xmlns.com/foaf/0.1/"
+    xmlns:bibo="http://purl.org/ontology/bibo/#"
+    xmlns:orca="http://vocab.deri.ie/orca#">
+    
+    <gn:Feature rdf:about="http://www.fontane-notizbuecher.de/places.xml#Auerstedt">
+        <!-- wenn kein GND-Link vorhanden: -->
+        <gn:name>Auerstedt</gn:name>
+        <gn:alternateName>Auerstaedt</gn:alternateName>
+        <crm:P7i_witnessed rdf:resource="http://d-nb.info/gnd/4126639-0"/>
+        <owl:sameAs rdf:resource="http://d-nb.info/gnd/4079866-5"/>        
+    </gn:Feature>
+    
+    <gn:Feature rdf:about="http://www.fontane-notizbuecher.de/places.xml#Prag">                     
+        <owl:sameAs rdf:resource="http://d-nb.info/gnd/4076310-9"/>
+    </gn:Feature>
+    
+    <gn:Feature rdf:about="http://textgridrep.org/textgrid:123454#Karlsbruecke">        
+        <owl:sameAs rdf:resource="http://d-nb.info/gnd/4324745-3"/>
+        <gn:parentFeature rdf:resource="http://d-nb.info/gnd/4076310-9"/>
+        <dcterms:creator rdf:resource="http://d-nb.info/gnd/118789708"/>
+        <crm:P70i_is_documented_in rdf:resource="http://d-nb.info/1065609620"/>
+    </gn:Feature>    
+    
+    <schema:CreativeWork rdf:about="http://www.fontane-notizbuecher.de/works.xml#Rosenkranzmadonna">
+        <schema:name>Madonna mit Rosenkranz, Florenz, Palazzo Pitti</schema:name>
+        <schema:variantName>Madonna mit Kind</schema:variantName>
+        <owl:sameAs rdf:resource="http://www.wikidata.org/wiki/Q17515838"/>
+        <dcterms:creator rdf:resource="http://d-nb.info/gnd/11858586X"/>
+        <crm:P70i_is_documented_in rdf:resource="http://www.fontane-notizbuecher.de/lit.xml#Palazzo_Pitti_Inventar"/>
+    </schema:CreativeWork>
+    
+    <!-- Wenn kein DNB-Link vorhanden: -->
+    <orca:Source rdf:about="http://www.fontane-notizbuecher.de/lit.xml#Palazzo_Pitti_Inventar">        
+        <owl:sameAs rdf:resource="http://worldcat.org/entity/work/id/4327837"/>
+    </orca:Source>
+    
+    <!-- Wenn kein Normdatensatz vorhanden: -->
+    <orca:Source rdf:about="http://www.fontane-notizbuecher.de/lit.xml#Schubarth-Engelschall_1976">
+        <crm:P48_has_preferred_identifier>Schubarth-Engelschall 1976</crm:P48_has_preferred_identifier>
+        <dcterms:bibliographicCitation>Angelika Schubarth-Engelschall: Die Notizbücher Fontanes. Eine Übersicht. In: Fontane Blätter Sonderheft 4 (1976): Register für die Bände 1 (1965)&#x2013;2 (1973) [Hefte 1&#x2013;16] und die Sonderhefte 1&#x2013;3. Zusammengestellt von Angelika Schubarth-Engelschall. Beigedruckt: Die Notizbücher Theodor Fontanes. Eine Übersicht. Potsdam 1976, S. 64ff.</dcterms:bibliographicCitation>
+    </orca:Source>
+    
+    <!-- Wenn kein Normdatensatz vorhanden: -->
+    <schema:creativeWork rdf:about="http://www.fontane-notizbuecher.de/works.xml#Psalmenuebersetzung">
+        <schema:name>Psalmen (Übersetzung)</schema:name>
+        <bibo:translationOf rdf:resource="http://d-nb.info/gnd/4047632-7"/>
+        <dcterms:creator rdf:resource="http://d-nb.info/gnd/118575449"/>
+    </schema:creativeWork>
+    
+    <crm:E33_Linguistic_Object rdf:about="http://www.fontane-notizbuecher.de/Notizbuch%20YYY#xpath(//surface[@n='XXXr']//rs[@ref = '#Schlacht_Auerstedt'][1])">
+        <schema:mentions rdf:resource="http://d-nb.info/gnd/4126639-0"/>
+    </crm:E33_Linguistic_Object>
+    
+    <crm:E33_Linguistic_Object rdf:about="http://www.fontane-notizbuecher.de/Notizbuch%20YYY#xpath(//surface[@n='XXXr']//rs[@ref = '#Schlacht_Auerstedt'][2])">
+        <schema:mentions rdf:resource="http://d-nb.info/gnd/4126639-0"/>
+    </crm:E33_Linguistic_Object>   
+    
+    <crm:E33_Linguistic_Object rdf:about="http://www.fontane-notizbuecher.de/Notizbuch%20C07#xpath(//surface[@n='1r']//rs[@ref='#Luther'][1])">
+        <schema:mentions rdf:resource="http://d-nb.info/gnd/118575449"/>
+    </crm:E33_Linguistic_Object>    
+    
+    <crm:E21_Person rdf:about="http://www.fontane-notizbuecher.de/pers.xml#Parler">
+        <owl:sameAs rdf:resource="http://d-nb.info/gnd/118789708"/>
+    </crm:E21_Person>
+    
+    <crm:E21_Person rdf:about="http://www.fontane-notizbuecher.de/pers.xml#Bossart">    
+        <owl:sameAs rdf:resource="http://d-nb.info/gnd/1065103336"/>
+        
+        <!-- falls kein GND-Link vorhanden: -->
+        <gndo:dateOfBirth rdf:ID="#Bossart1">1816</gndo:dateOfBirth>
+        <gndo:dateOfDeath>1895</gndo:dateOfDeath>
+        
+        <!-- falls kein GND-Link vorhanden: -->
+        <gndo:professionOrOccupationAsLiteral>Theologe</gndo:professionOrOccupationAsLiteral>
+        
+        <gndo:biographicalOrHistoricalInformation>Jugendfreund F.s, um 1840 Mitglied des Berliner ‚Lenau-Vereins‘</gndo:biographicalOrHistoricalInformation>
+    </crm:E21_Person>
+    
+    <!-- falls unsicher oder ungenau: -->
+    <rdf:Description rdf:about="#Bossart1">        
+        <orca:hasConfidenceLevel rdf:resource="http://vocab.deri.ie/orca#HypotheticalKnowledge"/>
+    </rdf:Description>
+    
+    <crm:E47_Group rdf:about="http://www.fontane-notizbuecher.de/pers.xml#Thueringer">
+        <owl:sameAs rdf:resource="http://d-nb.info/gnd/4059980-2"/>
+    </crm:E47_Group>
+    
+    <crm:E47_Group rdf:about="http://www.fontane-notizbuecher.de/pers.xml#Luther_Familie">
+        <crm:P107_has_current_or_former_member rdf:resource="http://www.fontane-notizbuecher.de/pers.xml#Martin_Luther"/>
+    </crm:E47_Group>
+    
+    <crm:E5_Event rdf:about="http://www.fontane-notizbuecher.de/events.xml#Schlacht_Auerstedt">
+        <owl:sameAs rdf:resource="http://d-nb.info/gnd/4126639-0"/>
+    </crm:E5_Event>
+    
+    <foaf:Organization rdf:about="http://www.fontane-notizbuecher.de/org.xml#Schmalkaldischer_Bund">
+        <owl:sameAs rdf:resource="http://d-nb.info/gnd/4133026-2"/>
+    </foaf:Organization>
+    
+    <schema:CreativeWork rdf:about="http://www.fontane-notizbuecher.de/works.xml#Ein_feste_Burg">
+        <dcterms:creator rdf:resource="http://d-nb.info/gnd/118575449"/>
+        <owl:sameAs rdf:resource="http://d-nb.info/gnd/4327122-4"/>
+    </schema:CreativeWork>
+    
+    <bibo:Periodical rdf:about="http://www.fontane-notizbuecher.de/works.xml#National-Zeitung">
+        <owl:sameAs rdf:resource="http://d-nb.info/gnd/4735095-7"/>
+    </bibo:Periodical>
+    
+    <schema:CreativeWork rdf:about="http://www.fontane-notizbuecher.de/works.xml#Schach_von_Wuthenow">        
+        <owl:sameAs rdf:resource="http://d-nb.info/gnd/4204437-6"/>
+        <schema:character rdf:resource="http://www.fontane-notizbuecher.de/works.xml#Buelow"/>
+        <schema:contentLocation rdf:resource="http://www.fontane-notizbuecher.de/works.xml#Salon_Carayon"/>
+    </schema:CreativeWork>
+    
+    <schema:Person rdf:about="http://www.fontane-notizbuecher.de/works.xml#Buelow">
+        <schema:name>Herr von Buelow (Figur; ausserliterarisches Vorbild: Adam Heinrich Friedrich Freiherr von Buelow [1757&#x2013;1807])</schema:name> <!-- wenn kein <owl:sameAs rdf:resource="http://d-nb.info/gnd/XXX"/> vorhanden-->
+        <schema:alternateName>H. v. B.</schema:alternateName> <!-- wenn kein <owl:sameAs rdf:resource="http://d-nb.info/gnd/XXX"/> vorhanden-->
+    </schema:Person>
+    
+    <schema:Place rdf:about="http://www.fontane-notizbuecher.de/works.xml#Salon_Carayon">
+        <schema:name>Salon der Frau von Carayon (Schauplatz)</schema:name><!-- wenn kein <owl:sameAs rdf:resource="http://d-nb.info/gnd/XXX"/> vorhanden-->
+    </schema:Place>
+        
+    <crm:E33_Linguistic_Object rdf:about="http://www.fontane-notizbuecher.de/Notizbuch%20YYY#xpath(//surface[@n='ZZZ']//rs[@ref = '#Buelow')">
+        <schema:mentions rdf:resource="http://www.fontane-notizbuecher.de/works.xml#Buelow"/>
+    </crm:E33_Linguistic_Object>
+    
+</rdf:RDF>
