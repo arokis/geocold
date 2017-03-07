@@ -16,7 +16,8 @@
         <gn:name>Auerstedt</gn:name>
         <gn:alternateName>Auerstaedt</gn:alternateName>
         <crm:P7i_witnessed rdf:resource="http://d-nb.info/gnd/4126639-0"/>
-        <owl:sameAs rdf:resource="http://d-nb.info/gnd/4079866-5"/>        
+        <!--<owl:sameAs rdf:resource="http://d-nb.info/gnd/4079866-5"/>    -->
+        <owl:sameAs rdf:resource="http://d-nb.info/gnd/4021477-1/about/lds"/>    
     </gn:Feature>
     
     <gn:Feature rdf:about="http://www.fontane-notizbuecher.de/places.xml#Prag">                     
@@ -76,7 +77,8 @@
         <owl:sameAs rdf:resource="http://d-nb.info/gnd/1065103336"/>
         
         <!-- falls kein GND-Link vorhanden: -->
-        <gndo:dateOfBirth rdf:ID="#Bossart1">1816</gndo:dateOfBirth>
+        <!-- Hab hier rdf:ID korrigiert, kein #! -->
+        <gndo:dateOfBirth rdf:ID="Bossart1">1816</gndo:dateOfBirth>
         <gndo:dateOfDeath>1895</gndo:dateOfDeath>
         
         <!-- falls kein GND-Link vorhanden: -->

@@ -33,10 +33,11 @@ def coord_from_pred(graph, dic):
         if p in dic['labels']:
             geo_object['label'] = o
         if p in coordinate_keys:
+            print o
             regex = re.compile(dic['coordinates'][p])
             match = regex.match(o)
             if match:
-                geo_object['coordinates'] = {'lat': match.group(1), 'long': match.group(2)}
+                geo_object['coordinates'] = {'long': match.group(1), 'lat': match.group(2)}
             else:
                 geo_object['coordinates'] = o
     return geo_object
@@ -52,6 +53,7 @@ def http_lookup(url, headers, mapping_dict):
     graph = parse_rdf(tmp)
     #print coord_from_pred(graph, kv)
     obj = coord_from_pred(graph, mapping_dict)
+    obj['uri'] = url
     tmp.close()
     return obj
 

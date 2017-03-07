@@ -6,7 +6,7 @@ function initGeoCoLD(){
 	map=new mr.Map(document.getElementById("map"));  //dom element
 	
 	var center=new mr.LatLng(0,0);  //latitude, longitude
-	map.centerAndZoom(new mr.LatLng(35, 25),2.3); //1.5 = zoomlevel
+	map.centerAndZoom(new mr.LatLng(35, 25),2.5); //1.5 = zoomlevel
 	
 	// define position
 	var point = new mr.LatLng(50.875311, 0.351563);
@@ -92,48 +92,64 @@ function initGeoCoLD(){
 		});
 */
 	
-	
+	/*
 	//DOM-element as marker
-/*	var p=document.createElement("span");
+	var p=document.createElement("span");
 	p.innerHTML="Hello World!";
 	var marker4 = new mr.overlay.Marker({
 		position: new mr.LatLng(center),
-		icon:{
-			url:p
-		},
-		raiseOnDrag: false, 
+		//icon:{
+		//	url:p
+		//},
+		//raiseOnDrag: false,
+		map: map, 
 		title:"DOM-element"
 	});
 	map.addOverlay(marker4);
-	marker4.makeMoveable(); */
-	
-	
+	//marker4.makeMoveable(); 
+	*/
+	/*
 	// another DOM-element marker with css-styles
-/*	var div=document.createElement("div");
+	var div=document.createElement("div");
 	var marker5 = new mr.overlay.Marker({position: new mr.LatLng(-20,-20), icon:div, raiseOnDrag: false, title: "DOM-element"});
 	map.addOverlay(marker5);
 	div.style.height = "20px";
 	div.style.width = "20px";
 	div.style.backgroundColor="red";
-	marker5.makeMoveable();
+	//marker5.makeMoveable();
 	*/
 }
 
+
 let test = function() {
+	
 	var myLatlng = new mr.LatLng(51.3,9.4);
 		var marker2 = new mr.overlay.Marker({
 			position: myLatlng, 
 			map: map,
 			title:"Kuhberg"
 		});
+	
+	let par = $('body area').parent()
+	console.log(par)
 }
+
 
 let plottResponse = function (list) {
     for ($i = 0; $i < list.length; $i++){
         let geo_mark = list[$i]
         setMarker(geo_mark);
+		
+		let par = $('body area').parent().last()
+		let marker_id = par.attr('id')
+		par.parent().attr('data-id', marker_id)
+		//console.log(par.parent().attr('data-id'))
+		
+		setEntry('#identified tbody', geo_mark, marker_id);
+		//console.log(par.parent('div'))
     };
 }
+
 
 let setMarker = function (place) {
         let label = place['label']
@@ -144,10 +160,19 @@ let setMarker = function (place) {
         console.log('Long.: ' + place['coordinates']['long'])
         console.log('Lat. : ' + place['coordinates']['lat'])
         */
-        var myLatlng = new mr.LatLng(long,lat);
+        var myLatlng = new mr.LatLng(lat,long);
 		var marker2 = new mr.overlay.Marker({
 			position: myLatlng, 
 			map: map,
 			title:label
 		});
+}
+
+
+let setEntry = function (element, place, mark_id) {
+	let uri = place['uri']
+	let label = place['label']
+	let long = place['coordinates']['long']
+	let lat = place['coordinates']['lat']
+	$(element).append('<tr><td><a href="'+mark_id+'" data-mark="'+mark_id+'">'+label+'</a></td><td>'+uri+'</td><td>'+long+', '+lat+'</td></tr>');
 }

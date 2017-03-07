@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>GeoCoLD - Mapsite</title>
+    <title>GeoCoLD</title>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
     
@@ -32,55 +32,20 @@
         </div>
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
           <ul class="nav navbar-nav navbar-right">
-            <li><a href="index.html">start</a></li>
-            <li class="active"><a href="mapsite.html">mapsite</a></li>
+            <li class="active"><a href="index.html">start</a></li>
+            <li><a href="mapsite.html">mapsite</a></li>
             <li><a href="about.html">about</a></li>
           </ul>
         </div><!-- /.navbar-collapse -->
       </div><!-- /.container-fluid -->
     </nav>
     
-		<div id="map" class="container-fluid"></div>
-		<div class="content container-fluid">
-      <h2>Analysis</h2>
+		
+	  <div class="content container-fluid">
+      <h2>Fileimport</h2>
       <div class="row">
-        <div class="col-md-6">
-          <div class="panel panel-success">
-            <div class="panel-heading">
-              <h3 class="panel-title">Identified Places</h3>
-            </div>
-            <div class="panel-body">
-              <table id="identified" class="table table-condensed table-striped">
-                <tr>
-                  <th>prefered label</th>
-                  <th>URI</th>
-                  <th>coordinates</th>
-                </tr>
-                <!--
-                <tr>
-                  <td>1</td>
-                  <td>Test</td>
-                  <td>Test</td>
-                </tr>
-                -->
-              </table>
-            </div>
-          </div>  
-        </div>
-        <div class="col-md-6">
-          <div class="panel panel-warning">
-            <div class="panel-heading">
-              <h3 class="panel-title">Unidentifyed Entities</h3>
-            </div>
-            <div class="panel-body">
-              Panel content
-            </div>
-          </div>  
-        </div>
         
       </div>
-      <h2>Set a mark!</h2>
-      <button onclick="test()" type="button" class="btn btn-default">DER Kuhberg</button>
     </div>
 
     <footer class="footer">
@@ -121,6 +86,5 @@
     <!--Own JS to handle GeoCoLD-->
     <script type="text/javascript" language="javascript" src="js/map.js"></script>
     <script type="text/javascript" language="javascript" src="js/main.js"></script>
-    <script type="text/javascript" language="javascript" src="js/call.js"></script>
 	</body>
 </html>
