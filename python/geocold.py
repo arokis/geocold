@@ -22,6 +22,16 @@ class Response():
          self.content_type = header.get('content-type')
 
 
+class Entity():
+    def __init__(self, uri):
+        self.uri = uri
+
+    
+    def same_as(self):
+        pass
+    
+
+
 
 def bag_of_uris(graph):
     """
@@ -78,6 +88,13 @@ def http_lookup(url, headers, mapping_dict):
         obj = coord_from_pred(graph, mapping_dict)
         obj['uri'] = url
         return obj
+    else:
+        obj = dict()
+        obj['uri'] = url
+        obj['type'] = 'NONE'
+        obj['status-code'] = r.status_code
+        obj['content-type'] = r.content_type
+        return obj
 
 
 def individuate(array):
@@ -105,7 +122,7 @@ def parse_rdf_file(file_path):
         rdf_format = rdflib.util.guess_format(file_path)
         return graph.parse(file_path, format=rdf_format)
     except AttributeError:
-        print ('[GeoCoLD:RDF-PARSING]: Error in guessing format. Working on default (application/rdf+xml)!')
+        #print ('[GeoCoLD:RDF-PARSING]: Error in guessing format. Working on default (application/rdf+xml)!')
         return graph.parse(file_path)
 
 
@@ -143,7 +160,7 @@ def request(uri, headers=False):
 ###     MAIN              ###
 #############################
 
-def look():
+def main():
     
     headers = {
             'user-agent': 'GeoCoLD/0.0.1',
@@ -163,6 +180,23 @@ def look():
             }
         }
     
+    uris = [
+        'http://d-nb.info/gnd/4021477-1',
+        'http://d-nb.info/gnd/4007879-6', 
+        'http://d-nb.info/gnd/118789708',
+        'http://worldcat.org/entity/work/id/4327837',
+        'http://d-nb.info/gnd/4324745-3',
+        'http://vocab.deri.ie/orca#Source',
+        'http://sws.geonames.org/2918632',
+        'http://sws.geonames.org/2867613',
+        'http://www.wikidata.org/wiki/Q17515838'
+        ]
+
+    for uri in uris:
+        result = http_lookup(uri, headers, mapping)
+        print result
+        print '###'
+
     """
     r = request('http://d-nb.info/gnd/4007879-6', headers=headers)
     #print r.content
@@ -172,8 +206,7 @@ def look():
         graph = parse_rdf_source(r.content)
         print_graph(graph)
     """
-    result = http_lookup('http://d-nb.info/gnd/4007879-6', headers, mapping)
-    print result
+    
 
 if __name__ == '__main__':
-    look()
+    main()
