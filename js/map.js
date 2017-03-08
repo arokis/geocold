@@ -174,5 +174,5 @@ let setEntry = function (element, place, mark_id) {
 	let label = place['label']
 	let long = place['coordinates']['long']
 	let lat = place['coordinates']['lat']
-	$(element).append('<tr><td><a href="'+mark_id+'" data-mark="'+mark_id+'">'+label+'</a></td><td>'+uri+'</td><td>'+long+', '+lat+'</td></tr>');
+	$(element).append('<tr><td><a href="'+mark_id+'" data-mark="'+mark_id+'">'+label+'</a></td><td><a href="'+uri+'">'+uri+'</a></td><td>'+long+', '+lat+'</td></tr>');
 }
