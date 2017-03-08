@@ -2,7 +2,14 @@ $(document).ready(function() {
     
     initGeoCoLD();
     
-    json_list = ["http://d-nb.info/gnd/4007879-6", "http://d-nb.info/gnd/4021477-1", "http://d-nb.info/gnd/4013255-9", "http://d-nb.info/gnd/7688136-2"];
+    json_list = [
+        "http://sws.geonames.org/2867613", 
+        "http://d-nb.info/gnd/4021477-1", 
+        "http://d-nb.info/gnd/4013255-9", 
+        "http://d-nb.info/gnd/7688136-2", 
+        "http://d-nb.info/gnd/4324745-3", 
+        "http://d-nb.info/gnd/118789708",
+        "http://www.fontane-notizbuecher.de/pers.xml#Bossart"];
     json_list2 = ["http://d-nb.info/gnd/4007879-6"];
     //postData('http://d-nb.info/gnd/4021477-1')
     postData(JSON.stringify(json_list));

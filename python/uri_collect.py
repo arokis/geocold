@@ -32,15 +32,25 @@ def main():
 
     GEO = rdflib.Namespace('http://www.opengis.net/ont/geosparql#')
     GNDO = rdflib.Namespace('http://d-nb.info/standards/elementset/gnd#')
+    GN = rdflib.Namespace('http://www.geonames.org/ontology#')
+    OWL = rdflib.Namespace('http://www.w3.org/2002/07/owl#')
+    WG84 = rdflib.Namespace('http://www.w3.org/2003/01/geo/wgs84_pos#')
 
-    geo_asWKT = GEO.asWKT
-    gnd_preferedLabel = GNDO.preferredNameForThePlaceOrGeographicName
 
     mapping = {
-        'labels' : gnd_preferedLabel,
+        'labels' : [
+            GNDO.preferredNameForThePlaceOrGeographicName, 
+            GN.name
+            ],
         'coordinates' : {
-            geo_asWKT : r'Point \(\s?(\+[\d.]+)\s(\+[\d.]+)\s?\)'
-            }
+            GEO.asWKT : {
+                'regex' : r'Point \(\s?(\+[\d.]+)\s(\+[\d.]+)\s?\)',
+                'groups': ['long', 'lat']
+                },
+            WG84.lat  : 'lat',
+            WG84.long : 'long'
+            },
+        'sameAs' : [OWL.sameAs]
         }
     
     """
@@ -53,7 +63,7 @@ def main():
     
     for uri in unified_bag:
         try:
-            print geocold.http_lookup(uri, headers, mapping)
+            print geocold.http_lookup(uri, headers, mapping).__dict__
             print '###'
             """
             response = geocold.request(uri, headers=headers)

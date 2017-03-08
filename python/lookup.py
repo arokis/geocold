@@ -32,15 +32,25 @@ def lookup():
 
         GEO = rdflib.Namespace('http://www.opengis.net/ont/geosparql#')
         GNDO = rdflib.Namespace('http://d-nb.info/standards/elementset/gnd#')
+        GN = rdflib.Namespace('http://www.geonames.org/ontology#')
+        OWL = rdflib.Namespace('http://www.w3.org/2002/07/owl#')
+        WG84 = rdflib.Namespace('http://www.w3.org/2003/01/geo/wgs84_pos#')
 
-        geo_asWKT = GEO.asWKT
-        gnd_preferedLabel = GNDO.preferredNameForThePlaceOrGeographicName
 
         mapping = {
-            'labels' : gnd_preferedLabel,
+            'labels' : [
+                GNDO.preferredNameForThePlaceOrGeographicName, 
+                GN.name
+                ],
             'coordinates' : {
-                geo_asWKT : r'Point \(\s?(\+[\d.]+)\s(\+[\d.]+)\s?\)'
-                }
+                GEO.asWKT : {
+                    'regex' : r'Point \(\s?(\+[\d.]+)\s(\+[\d.]+)\s?\)',
+                    'groups': ['long', 'lat']
+                    },
+                WG84.lat  : 'lat',
+                WG84.long : 'long'
+                },
+            'sameAs' : [OWL.sameAs]
             }
 
 
@@ -48,10 +58,10 @@ def lookup():
         if isinstance(input_url, list):
             out_list = list()
             for url in input_url:
-                out_list.append(geocold.http_lookup(url, headers, mapping))
+                out_list.append(geocold.http_lookup(url, headers, mapping).__dict__)
             output = json.dumps(out_list)
         else:
-            output = json.dumps(geocold.http_lookup(input_url, headers, mapping))
+            output = json.dumps(geocold.http_lookup(input_url, headers, mapping).__dict__)
 
         print output
         #resp = make_response('{"response": ' + output + '}')

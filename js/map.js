@@ -138,23 +138,29 @@ let test = function() {
 let plottResponse = function (list) {
     for ($i = 0; $i < list.length; $i++){
         let geo_mark = list[$i]
-        setMarker(geo_mark);
-		
-		let par = $('body area').parent().last()
-		let marker_id = par.attr('id')
-		par.parent().attr('data-id', marker_id)
-		//console.log(par.parent().attr('data-id'))
-		
-		setEntry('#identified tbody', geo_mark, marker_id);
-		//console.log(par.parent('div'))
+        console.log(geo_mark)
+
+		if (geo_mark['type'] == 'place'){
+			setMarker(geo_mark);
+			
+			let par = $('body area').parent().last()
+			let marker_id = par.attr('id')
+			par.parent().attr('data-id', marker_id)
+			//console.log(par.parent().attr('data-id'))
+			
+			setEntry('#identified tbody', geo_mark, marker_id);
+			//console.log(par.parent('div'))
+		} else {
+			setUnknown(geo_mark);
+		}
     };
 }
 
 
 let setMarker = function (place) {
         let label = place['label']
-        let long = place['coordinates']['long']
-        let lat = place['coordinates']['lat']
+        let long = place['long']
+        let lat = place['lat']
         /*
         console.log('Label: ' + place['label'])
         console.log('Long.: ' + place['coordinates']['long'])
@@ -169,10 +175,16 @@ let setMarker = function (place) {
 }
 
 
+let setUnknown = function (entity) {
+	let uri = entity['uri'];
+	$('#unknown tbody').append('<tr><td><a href="'+uri+'">'+uri+'</a></td></tr>');
+
+}
+
 let setEntry = function (element, place, mark_id) {
 	let uri = place['uri']
 	let label = place['label']
-	let long = place['coordinates']['long']
-	let lat = place['coordinates']['lat']
+	let long = place['long']
+	let lat = place['lat']
 	$(element).append('<tr><td><a href="'+mark_id+'" data-mark="'+mark_id+'">'+label+'</a></td><td><a href="'+uri+'">'+uri+'</a></td><td>'+long+', '+lat+'</td></tr>');
 }

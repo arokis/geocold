@@ -13,6 +13,7 @@ from collections import OrderedDict
 import json
 import requests
 import rdflib
+from rdflib.namespace import RDF
 
 class Response():
      def __init__(self, status, header, content):
@@ -25,12 +26,67 @@ class Response():
 class Entity():
     def __init__(self, uri):
         self.uri = uri
+        self.type = 'unknown'
 
     
-    def same_as(self):
-        pass
-    
+class SilentEntity(Entity):
+    status = 'inactive'
 
+    def __init__(self, uri):
+        Entity.__init__(self, uri)
+        
+
+class ActiveEntity(Entity):
+    status = 'active'
+
+    def __init__(self, uri):
+        Entity.__init__(self, uri)
+        self.sameAs = list()
+        self.cls = list()
+    
+    def classify(self, subj, pred, obj):
+        #print subj
+        #print self.uri
+        if self.uri in subj and pred == RDF.type:
+            self.cls.append({str(subj) : obj})
+
+    def identify(self, graph, mapping):
+        #self.mapping = mapping
+        coordinates = [key for key in mapping['coordinates']]
+        for s,p,o in graph:
+            #print s,p,o
+            o = str(o.encode('utf-8'))
+            self.classify(s, p, o)
+            self.same(p, o, mapping['sameAs'])
+            self.name_me(p, o, mapping['labels'])
+            self.find_coordinates(p, o, mapping['coordinates'])
+            
+    def name_me(self, pred, obj, mapping):
+        if pred in mapping:
+            self.label = obj
+
+    def same(self, pred, obj, same):
+        if pred in same:
+            self.sameAs.append(obj) 
+
+    def find_coordinates(self, pred, obj, coord_mapping):
+        if pred in coord_mapping:
+            self.type = 'place'
+            try: # fro all more complex matchings
+                regex = re.compile(coord_mapping[pred].get('regex'))
+                group = coord_mapping[pred].get('groups')
+                match = regex.match(obj)
+                
+                if match:
+                    setattr(self, group[0], match.group(1))
+                    setattr(self, group[1], match.group(2))
+                else: 
+                    self.coordinates = obj
+                
+            except: # if no regex is provided then we will deal with single properties and simple mappings
+                value = coord_mapping[pred]
+                setattr(self, value, obj)
+                
 
 
 def bag_of_uris(graph):
@@ -52,49 +108,21 @@ def bag_of_uris(graph):
     return bag
 
 
-def coord_from_pred(graph, dic):
-    """
-    naive!
-    """
-    #print dic
-    #geo_list = list()
-    geo_object = dict()
-    coordinate_keys = [key for key in dic['coordinates']]
-    #print dic['coordinates'][coordinate_keys[0]]
-    #print coordinate_keys
-    for s,p,o in graph:
-        o = str(o.encode('utf-8'))
-        if p in dic['labels']:
-            geo_object['label'] = o
-        if p in coordinate_keys:
-            #print o
-            regex = re.compile(dic['coordinates'][p])
-            match = regex.match(o)
-            if match:
-                geo_object['coordinates'] = {'long': match.group(1), 'lat': match.group(2)}
-            else:
-                geo_object['coordinates'] = o
-    return geo_object
-
-
 def http_lookup(url, headers, mapping_dict):
     r = request(url, headers=headers)
     #print request.status_code
     if 200 >= r.status_code <= 299 and 'application/rdf+xml' in r.content_type:
         #print r.target + ' > status-code: ' + str(r.status_code) + ' > content: ' + r.content_type
-        #print r.target + ' with ' + str(r.status_code) + ' as ' + r.content_type
         graph = parse_rdf_source(r.content)
-        #geocold.print_graph(graph)
-        obj = coord_from_pred(graph, mapping_dict)
-        obj['uri'] = url
-        return obj
+        entity = ActiveEntity(url)
+        entity.identify(graph, mapping_dict)
+        return entity
     else:
-        obj = dict()
-        obj['uri'] = url
-        obj['type'] = 'NONE'
-        obj['status-code'] = r.status_code
-        obj['content-type'] = r.content_type
-        return obj
+        silent_entity = SilentEntity(url)
+        silent_entity.type = 'silent'
+        silent_entity.status_code = r.status_code
+        #silent_entity.content_type = r.content_type
+        return silent_entity
 
 
 def individuate(array):
@@ -169,15 +197,25 @@ def main():
 
     GEO = rdflib.Namespace('http://www.opengis.net/ont/geosparql#')
     GNDO = rdflib.Namespace('http://d-nb.info/standards/elementset/gnd#')
+    GN = rdflib.Namespace('http://www.geonames.org/ontology#')
+    OWL = rdflib.Namespace('http://www.w3.org/2002/07/owl#')
+    WG84 = rdflib.Namespace('http://www.w3.org/2003/01/geo/wgs84_pos#')
 
-    geo_asWKT = GEO.asWKT
-    gnd_preferedLabel = GNDO.preferredNameForThePlaceOrGeographicName
 
     mapping = {
-        'labels' : gnd_preferedLabel,
+        'labels' : [
+            GNDO.preferredNameForThePlaceOrGeographicName, 
+            GN.name
+            ],
         'coordinates' : {
-            geo_asWKT : r'Point \(\s?(\+[\d.]+)\s(\+[\d.]+)\s?\)'
-            }
+            GEO.asWKT : {
+                'regex' : r'Point \(\s?(\+[\d.]+)\s(\+[\d.]+)\s?\)',
+                'groups': ['long', 'lat']
+                },
+            WG84.lat  : 'lat',
+            WG84.long : 'long'
+            },
+        'sameAs' : [OWL.sameAs]
         }
     
     uris = [
@@ -191,11 +229,28 @@ def main():
         'http://sws.geonames.org/2867613',
         'http://www.wikidata.org/wiki/Q17515838'
         ]
-
+    
+    liste = list()
     for uri in uris:
         result = http_lookup(uri, headers, mapping)
-        print result
+        try:
+            if result.type == 'unknown' and len(result.sameAs) > 0:
+                print 'NEUER VERSUCH MÖGLICH: (' + str(len(result.sameAs)) + ')'
+                print result.sameAs
+                print result.__dict__
+            elif result.type == 'place':
+                print 'IDENTIFIZIERT: '
+                print result.__dict__
+            else: 
+                print 'unbekannt: ' + result.uri
+        except AttributeError:
+            pass
+
+        #print json.dumps(result.__dict__)
+        #liste.append(result.__dict__)
+    
         print '###'
+    #print liste
 
     """
     r = request('http://d-nb.info/gnd/4007879-6', headers=headers)
