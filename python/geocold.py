@@ -185,8 +185,21 @@ def request(uri, headers=False):
 
 
 #############################
-###     MAIN              ###
+###     MAIN & Tests      ###
 #############################
+def testing():
+    #Simple testing area
+
+    uri = 'http://d-nb.info/gnd/4021477-1'
+
+    g = rdflib.Graph()
+    test = g.parse(uri)
+    for s,p,o in test:
+        print s,p,o
+    
+    print len(g)
+    
+
 
 def main():
     
@@ -230,6 +243,8 @@ def main():
         'http://www.wikidata.org/wiki/Q17515838'
         ]
     
+    
+    
     liste = list()
     for uri in uris:
         result = http_lookup(uri, headers, mapping)
@@ -251,7 +266,7 @@ def main():
     
         print '###'
     #print liste
-
+    
     """
     r = request('http://d-nb.info/gnd/4007879-6', headers=headers)
     #print r.content
@@ -264,4 +279,5 @@ def main():
     
 
 if __name__ == '__main__':
-    main()
+    #main()
+    testing()
