@@ -187,6 +187,16 @@ def request(uri, headers=False):
 #############################
 ###     MAIN & Tests      ###
 #############################
+"""
+rdflib:
+* Documentation: http://rdflib.readthedocs.io/en/stable/index.html
+* Tutorial & Examples: http://semanticweb.org/wiki/Getting_data_from_the_Semantic_Web.html
+
+requests HTTP-Lib
+* Documentation: http://docs.python-requests.org/en/master/
+"""
+
+
 def testing():
     #Simple testing area
 
@@ -202,7 +212,6 @@ def testing():
 
 
 def main():
-    
     headers = {
             'user-agent': 'GeoCoLD/0.0.1',
             'Accept' : 'application/rdf+xml'
