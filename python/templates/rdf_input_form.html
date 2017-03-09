@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="content container-fluid">
+<h2>Dataimport</h2>
+
+    {% if error %}
+      <div class="alert alert-danger" role="alert"><strong>Oops!</strong> An Error occured while parsing your RDF-data. You may check its validity and try again.</div>
+      <script type="text/javascript" language="javascript">
+        $(document).ready(function () {
+            
+            let data = '{{ error|tojson }}'
+            let json_data = JSON.parse(data)
+            
+            console.log(json_data)
+            
+        });
+      </script>
+    {% endif %}
+
+    <form action="/uri" method="post" class=add-entry>
+      <dl>
+        <dt>Paste your RDF-Data here:
+        <dd><textarea class="form-control" rows="5" cols="40" name="rdf"></textarea>
+        <dd><input type="submit" value="Parse RDF">
+      </dl>
+    </form>
+
+</div>
+
+{% endblock %}

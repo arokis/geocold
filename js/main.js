@@ -2,6 +2,14 @@ $(document).ready(function() {
     
     initGeoCoLD();
     
+    let data = '{{ data|tojson }}'
+       
+
+    $(document).ready(function() {
+    console.log(data)
+    console.log(JSON.parse(data))
+    })
+
     json_list = [
         "http://sws.geonames.org/2867613", 
         "http://d-nb.info/gnd/4021477-1", 

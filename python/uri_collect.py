@@ -9,50 +9,55 @@ import requests
 
 import geocold
 
-
-def main():
-
-    test_xml = '../data/fontante-register.rdf'
-    test_ttl = '../data/4007879-6_lds.ttl'
-
-    graph = geocold.parse_rdf_file(test_xml)
-    #creates_uri_bag(graph)
-    bag_of_uris = geocold.bag_of_uris(graph)
-    print len(bag_of_uris)
-    unified_bag = geocold.individuate(bag_of_uris) 
-    print len(unified_bag)
-    
-    #for i in unified_bag:
-    #    print i
-    
-    headers = {
-        'user-agent': 'test-app/0.0.1',
-        'Accept' : 'application/rdf+xml'
-        }
-
-    GEO = rdflib.Namespace('http://www.opengis.net/ont/geosparql#')
-    GNDO = rdflib.Namespace('http://d-nb.info/standards/elementset/gnd#')
-    GN = rdflib.Namespace('http://www.geonames.org/ontology#')
-    OWL = rdflib.Namespace('http://www.w3.org/2002/07/owl#')
-    WG84 = rdflib.Namespace('http://www.w3.org/2003/01/geo/wgs84_pos#')
+test_xml = '../data/fontante-register.rdf'
+test_ttl = '../data/4007879-6_lds.ttl'
 
 
-    mapping = {
-        'labels' : [
-            GNDO.preferredNameForThePlaceOrGeographicName, 
-            GN.name
-            ],
-        'coordinates' : {
-            GEO.asWKT : {
-                'regex' : r'Point \(\s?(\+[\d.]+)\s(\+[\d.]+)\s?\)',
-                'groups': ['long', 'lat']
-                },
-            WG84.lat  : 'lat',
-            WG84.long : 'long'
+
+#for i in unified_bag:
+#    print i
+
+headers = {
+    'user-agent': 'test-app/0.0.1',
+    'Accept' : 'application/rdf+xml'
+    }
+
+GEO = rdflib.Namespace('http://www.opengis.net/ont/geosparql#')
+GNDO = rdflib.Namespace('http://d-nb.info/standards/elementset/gnd#')
+GN = rdflib.Namespace('http://www.geonames.org/ontology#')
+OWL = rdflib.Namespace('http://www.w3.org/2002/07/owl#')
+WG84 = rdflib.Namespace('http://www.w3.org/2003/01/geo/wgs84_pos#')
+
+
+mapping = {
+    'labels' : [
+        GNDO.preferredNameForThePlaceOrGeographicName, 
+        GN.name
+        ],
+    'coordinates' : {
+        GEO.asWKT : {
+            'regex' : r'Point \(\s?(\+[\d.]+)\s(\+[\d.]+)\s?\)',
+            'groups': ['long', 'lat']
             },
-        'sameAs' : [OWL.sameAs]
-        }
-    
+        WG84.lat  : 'lat',
+        WG84.long : 'long'
+        },
+    'sameAs' : [OWL.sameAs] 
+    }
+
+
+
+def bagify(data):
+    bag = dict()
+    graph = geocold.parse_rdf_file(test_xml)
+    bag_of_uris = geocold.bag_of_uris(graph)
+    bag['original-count'] = len(bag_of_uris)
+    unified_bag = geocold.individuate(bag_of_uris)
+    bag['individuals'] = unified_bag 
+    return bag
+
+
+def lookup():
     """
     uri = bag_of_uris[15]
     
@@ -85,4 +90,7 @@ def main():
     
 
 if __name__ == '__main__':
-    main()
+    #main()
+    bag = geocold.bagify(test_xml)
+    print bag
+    print len(bag['individuals'])

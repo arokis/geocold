@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div id="map" class="container-fluid"></div>
+<div id="mapsite" class="content container-fluid">
+      <h2>Analysis</h2>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="panel panel-success">
+            <div class="panel-heading">
+              <h3 class="panel-title">Identified Places</h3>
+            </div>
+            <div class="panel-body">
+              <table id="identified" class="table table-condensed table-striped">
+                <tr>
+                  <th>prefered label</th>
+                  <th>URI</th>
+                  <th>coordinates</th>
+                </tr>
+                <!--
+                <tr>
+                  <td>1</td>
+                  <td>Test</td>
+                  <td>Test</td>
+                </tr>
+                -->
+              </table>
+            </div>
+          </div>  
+        </div>
+        <div class="col-md-6">
+          <div class="panel panel-warning">
+            <div class="panel-heading">
+              <h3 class="panel-title">Unidentifyed Entities</h3>
+            </div>
+            <div class="panel-body">
+              <table id="unknown" class="table table-condensed table-striped">
+                <tr>
+                  <th>URI</th>
+                </tr>
+                <!--
+                <tr>
+                  <td>1</td>
+                  <td>Test</td>
+                  <td>Test</td>
+                </tr>
+                -->
+              </table>
+            </div>
+          </div>  
+        </div>
+        
+      </div>
+      <h2>Set a mark!</h2>
+      <button onclick="test()" type="button" class="btn btn-default">DER Kuhberg</button>
+    </div>
+
+    <script type="text/javascript" language="javascript" src="{{ url_for('static', filename='js/map.js') }}"></script>
+    <script type="text/javascript" language="javascript" src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+    
+    <script type="text/javascript" language="javascript">
+      $(document).ready(function () {
+          
+          let data = '{{ data|tojson }}'
+          let json_data = JSON.parse(data)
+          
+          console.log('mapsite is running ...')
+          console.log(data)
+          console.log(json_data)
+          
+          // initialise GeoCoLD
+          initGeoCoLD();
+          
+          // testlist of uris
+          json_list = [
+              "http://sws.geonames.org/2867613", 
+              "http://d-nb.info/gnd/4021477-1", 
+              "http://d-nb.info/gnd/4013255-9", 
+              "http://d-nb.info/gnd/7688136-2", 
+              "http://d-nb.info/gnd/4324745-3", 
+              "http://d-nb.info/gnd/118789708",
+              "http://www.fontane-notizbuecher.de/pers.xml#Bossart"];
+          json_list2 = ["http://d-nb.info/gnd/4007879-6"];
+          //postData('http://d-nb.info/gnd/4021477-1')
+          
+          postData(JSON.stringify(json_list));
+
+      });
+    </script>
+    
+    
+{% endblock %}

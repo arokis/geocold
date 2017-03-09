@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block content %}
+    <div id="uri" class="content container-fluid">
+        <h2>uris</h2>
+        <div class="row">
+            {% if data %}
+            <ul>
+                {% for i in data['individuals'] %}
+                <li> {{ i }} </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p>no data</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <script type="text/javascript" language="javascript">
+      let make_a_pack = function (uris) {
+          let quotient = Math.floor(uris.length/10)
+          let all = [] 
+          let n = 0
+
+          while (n <= quotient) {
+              let out = uris.slice(0, 10)
+              all.push(out)
+              uris.splice(0, 10) 
+              /*
+              for (let i = 0; i < out.length; i++ ) {
+                console.log(out[i])
+                console.log('###')
+              }*/
+              n++
+          } 
+            
+            if (uris.length > 0) {
+                let out = uris.slice(0, uris.length)
+                all.push(out)
+                /*
+                for (let i = 0; i < uris.length; i++ ) {
+                    console.log(uris[i])
+                    console.log('###')
+                }*/
+            }
+            //console.log(all)
+            return all
+      };
+      
+      $(document).ready(function () {
+          
+          let data = '{{ data|tojson }}'
+          let json_data = JSON.parse(data)
+          
+          console.log(json_data)
+
+          let pack = make_a_pack(json_data['individuals'])
+          console.log(pack)
+          
+      });
+    </script>
+{% endblock %}

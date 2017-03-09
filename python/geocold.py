@@ -9,6 +9,7 @@ import tempfile
 import os
 import re
 import sys
+from xml.sax import SAXParseException
 from collections import OrderedDict
 import json
 import requests
@@ -89,7 +90,30 @@ class ActiveEntity(Entity):
                 
 
 
-def bag_of_uris(graph):
+def bagify(data):
+    """
+    Creates a bag of individual uris from RDF-Data
+    
+    ARG:
+    * data: rdf-data from file or string
+
+    RETURNS:
+    * [LIST]: a list containing all subject- and object-URIs
+    """
+    bag = dict()
+    graph = parse_rdf_source(data)
+    if graph:
+        all_uris = collect_uris(graph)
+        bag['original-count'] = len(all_uris)
+        unified_bag = individuate(all_uris)
+        bag['individuals'] = unified_bag 
+        return bag
+    else:
+        bag['error'] = {'source' : 'geocold.bagify', 'description' : 'Error while collecting uris. Check log-files!'}
+        return bag
+
+
+def collect_uris(graph):
     """
     Creates a list of uris incl. duplicates
     
@@ -144,22 +168,44 @@ def print_graph(graph):
 
 
 def parse_rdf_file(file_path):
+    """
+    parses RDF-Data from file
+    
+    ARG:
+    * file_path: path to a file
+
+    RETURNS:
+    * rdf.lib.Graph: Success -> a RDF-Graph-Object is returned
+    * False (bool): An Error occured while parsing
+    """
     graph = rdflib.Graph()
     # guess the files format and build the graph
+    result = False
+    print 'test'
     try:
         rdf_format = rdflib.util.guess_format(file_path)
-        return graph.parse(file_path, format=rdf_format)
+        result = graph.parse(file_path, format=rdf_format)
     except AttributeError:
-        #print ('[GeoCoLD:RDF-PARSING]: Error in guessing format. Working on default (application/rdf+xml)!')
-        return graph.parse(file_path)
+        try:
+            #print ('[GeoCoLD:RDF-PARSING]: Error in guessing format. Working on default (application/rdf+xml)!')
+            result = graph.parse(file_path)
+        except SAXParseException:
+            print "[GEOCOLD:ERROR] in parse_rdf_file(): SAXParseException was raised. File is not a valid xml file!"
+            pass
+    return result
 
 
 def parse_rdf_source(source):
+    #print type(source)
+    
     if os.path.isfile(source) and not os.path.isdir(source):
         return parse_rdf_file(source)
     else:
         tmp = tempfile.TemporaryFile()
-        tmp.write(source)
+        try:
+            tmp.write(source.encode('utf-8'))
+        except UnicodeDecodeError: # catching errors like "UnicodeDecodeError: 'ascii' codec can't decode byte 0xcc in position 2685: ordinal not in range(128)"
+            tmp.write(source)
         tmp.seek(0)
         output = parse_rdf_file(tmp)
         tmp.close()
@@ -288,5 +334,5 @@ def main():
     
 
 if __name__ == '__main__':
-    #main()
-    testing()
+    main()
+    #testing()

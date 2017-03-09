@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>GeoCoLD &#183; </title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <!--JQuery-CDN-->
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+
+    <!--MapLib API-->
+    <script type="text/javascript" src="http://maplib.khtml.org/maplib/newest/khtml_all.js"></script>
+		<script type="text/javascript" src="http://maplib.khtml.org/maplib/newest/js/overlay/Marker.js"></script>
+
+    <!-- BOOTSTRAP JS & CSS -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    
+    <!-- FONT-AWSOME -->
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css">
+    
+    <!--##############################
+    ## GeoCoLD's JS and CSS         ##
+    ###############################-->
+    <!--JS to handle GeoCoLD-->
+    <!--
+    <script type="text/javascript" language="javascript" src="{{ url_for('static', filename='js/map.js') }}"></script>
+    <script type="text/javascript" language="javascript" src="{{ url_for('static', filename='js/main.js') }}"></script>
+    -->
+    <!-- GeoCoLD CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+     
+  </head>
+
+  <body>
+
+    <nav class="navbar navbar-inverse">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">GeoCoLD</a>
+        </div>
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav navbar-right">
+            <li class="active"><a href="/input">start</a></li>
+            <li><a href="/mapsite">mapsite</a></li>
+            <li><a href="/about">about</a></li>
+            <li><a href="/contact">contact</a></li>
+          </ul>
+        </div><!-- /.navbar-collapse -->
+      </div><!-- /.container-fluid -->
+    </nav>
+    
+    {% block content %}{% endblock %} 
+
+    <footer class="footer">
+			<div class="footer-right">
+				<a href="#"><i class="fa fa-facebook"></i></a>
+				<a href="#"><i class="fa fa-twitter"></i></a>
+				<a href="#"><i class="fa fa-linkedin"></i></a>
+				<a href="#"><i class="fa fa-github"></i></a>
+			</div>
+			<div class="footer-left">
+
+				<p class="footer-links">
+					<a href="/">Home</a>
+					·
+					<a href="/mapsite">Mapsite</a>
+					·
+					<a href="/about">About</a>
+					·
+					<a href="#">Contact</a>
+				</p>
+
+				<p>GeoCoLD &copy; 2017</p>
+			</div>
+		</footer>
+
+    
+	</body>
+</html>
