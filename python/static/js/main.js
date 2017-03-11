@@ -1,6 +1,4 @@
 
-
-
 // the AJAX Request Handling script
 function postData(input) {
     console.log('calling lookup ...')
@@ -15,8 +13,8 @@ function postData(input) {
 
 
 function callbackFunc(response) {
-    console.log('received response from lookup:')
-    console.log(response);
+    console.log('AJAX received response from lookup:')
+    //console.log(response);
     plottResponse(response);
 }
     

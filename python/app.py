@@ -14,6 +14,56 @@ app = Flask(__name__, static_url_path='/static')
 CORS(app)
 
 # https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-ii-templates
+    
+
+@app.route("/")
+#@crossdomain(origin='*')
+def home():
+    app_title = 'Home'
+    return render_template('rdf_input_form.html', title=app_title)
+
+
+@app.route("/about")
+#@crossdomain(origin='*')
+def about():
+    app_title = 'About'
+    return render_template('about.html', title=app_title)
+
+
+@app.route("/input")
+#@crossdomain(origin='*')
+def input():
+    app_title = 'Input'
+    return render_template('rdf_input_form.html', title=app_title)
+
+
+@app.route("/contact")
+#@crossdomain(origin='*')
+def contact():
+    app_title = 'Contact'
+    return render_template('contact.html', title=app_title)
+
+
+@app.route("/mapsite")
+#@crossdomain(origin='*')
+def mapsite():
+    #POST = request.form['data']
+    app_title = 'Mapsite'
+    uris = {'individuals' : [
+        'http://d-nb.info/gnd/7688136-2',
+        'http://d-nb.info/gnd/4021477-1',
+        'http://d-nb.info/gnd/4007879-6', 
+        'http://d-nb.info/gnd/118789708',
+        'http://worldcat.org/entity/work/id/4327837',
+        'http://d-nb.info/gnd/4324745-3',
+        'http://vocab.deri.ie/orca#Source',
+        'http://sws.geonames.org/2918632',
+        'http://sws.geonames.org/2867613',
+        'http://www.wikidata.org/wiki/Q17515838'
+        ]}
+
+    return render_template('mapsite.html', title=app_title, data=uris)
+
 
 @app.route("/uri", methods=['POST'])
 #@crossdomain(origin='*')
@@ -22,62 +72,15 @@ def collect_uris():
     uri_bag = geocold.bagify(POST)
     #print type(POST[0])
     if not 'error' in uri_bag:
-        return render_template('uri.html', data=uri_bag)
+        app_title = 'Mapsite'
+        #return render_template('uri.html', data=uri_bag)
+        return render_template('mapsite.html', title=app_title, data=uri_bag)
     else:
         print uri_bag
         return render_template('rdf_input_form.html', error=uri_bag)
-    
-    
-
-@app.route("/input")
-#@crossdomain(origin='*')
-def input():
-    return render_template('rdf_input_form.html')
-
-@app.route("/mapsite")
-#@crossdomain(origin='*')
-def mapsite():
-    uris = [
-        'http://d-nb.info/gnd/4021477-1',
-        'http://d-nb.info/gnd/4007879-6', 
-        'http://d-nb.info/gnd/118789708',
-        'http://worldcat.org/entity/work/id/4327837',
-        'http://d-nb.info/gnd/4324745-3',
-        'http://vocab.deri.ie/orca#Source',
-        'http://sws.geonames.org/2918632',
-        'http://sws.geonames.org/2867613',
-        'http://www.wikidata.org/wiki/Q17515838'
-        ]
-    data = {'test' : 'bla'}
-
-    return render_template('mapsite.html', data=uris)
-
-@app.route("/about")
-#@crossdomain(origin='*')
-def about():
-    return render_template('about.html')
-
-@app.route("/test")
-#@crossdomain(origin='*')
-def test():
-    #if request.method == 'POST':
-
-    uris = [
-        'http://d-nb.info/gnd/4021477-1',
-        'http://d-nb.info/gnd/4007879-6', 
-        'http://d-nb.info/gnd/118789708',
-        'http://worldcat.org/entity/work/id/4327837',
-        'http://d-nb.info/gnd/4324745-3',
-        'http://vocab.deri.ie/orca#Source',
-        'http://sws.geonames.org/2918632',
-        'http://sws.geonames.org/2867613',
-        'http://www.wikidata.org/wiki/Q17515838'
-        ]
-    data = {'test' : 'bla'}
-    return render_template('rdf_input_form.html', data=uris)
 
 
-@app.route("/lookup", methods=['GET', 'POST'])
+@app.route("/lookup", methods=['POST'])
 #@crossdomain(origin='*')
 def lookup():
     if request.method == 'POST':
@@ -135,31 +138,3 @@ def lookup():
 if __name__ == '__main__':
     app.run(debug=True)
     
-
-
-
-"""
-Python code  -- app.py 
-
-from flask import Flask, render_template, redirect, url_for,request
-from flask import make_response
-app = Flask(__name__)
-
-@app.route("/")
-def home():
-    return "hi"
-@app.route("/index")
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-   message = None
-   if request.method == 'POST':
-        datafromjs = request.form['mydata']
-        result = "return this"
-        resp = make_response('{"response": '+result+'}')
-        resp.headers['Content-Type'] = "application/json"
-        return resp
-        return render_template('login.html', message='')
-if __name__ == "__main__":
-app.run(debug = True)
-"""

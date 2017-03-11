@@ -148,7 +148,7 @@ let plottResponse = function (list) {
 			par.parent().attr('data-id', marker_id)
 			//console.log(par.parent().attr('data-id'))
 			
-			setEntry('#identified tbody', geo_mark, marker_id);
+			setEntry('#identified', geo_mark, marker_id);
 			//console.log(par.parent('div'))
 		} else {
 			setUnknown(geo_mark);
@@ -186,5 +186,7 @@ let setEntry = function (element, place, mark_id) {
 	let label = place['label']
 	let long = place['long']
 	let lat = place['lat']
-	$(element).append('<tr><td><a href="'+mark_id+'" data-mark="'+mark_id+'">'+label+'</a></td><td><a href="'+uri+'">'+uri+'</a></td><td>'+long+', '+lat+'</td></tr>');
+	$(element).append('<button type="button" class="list-group-item">'+label+'('+uri+')</button><ul><li>mark-id: '+mark_id+'</li><li>long: '+long+'</li><li>lat: '+lat+'</li></ul>');
+		
+		//'<tr><td><a href="'+mark_id+'" data-mark="'+mark_id+'">'+label+'</a></td><td><a href="'+uri+'">'+uri+'</a></td><td>'+long+', '+lat+'</td></tr>');
 }

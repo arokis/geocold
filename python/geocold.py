@@ -45,19 +45,31 @@ class ActiveEntity(Entity):
         self.sameAs = list()
         self.cls = list()
     
-    def classify(self, subj, pred, obj):
-        #print subj
-        #print self.uri
-        if self.uri in subj and pred == RDF.type:
-            self.cls.append({str(subj) : obj})
+    def classify(self, graph):
+        uri = self.uri
+        if (uri, RDF.type, None):
+            fail = True
+            for obj_class in graph.objects( rdflib.URIRef(uri), RDF.type ):
+                fail = obj_class
+                self.cls = str(obj_class)
+            if fail: # check for trailing slash like in geonames-data
+                for obj_class in graph.objects( rdflib.URIRef(uri+'/'), RDF.type ):
+                    fail = obj_class
+                    self.cls = str(obj_class)
+        else: # bruteforcing all rdf:types and objects
+            for s, p, o in graph:
+                print s
+                if self.uri in s and p == RDF.type:
+                    self.cls.append({str(s) : o})
 
     def identify(self, graph, mapping):
         #self.mapping = mapping
         coordinates = [key for key in mapping['coordinates']]
+        self.classify(graph)
         for s,p,o in graph:
             #print s,p,o
             o = str(o.encode('utf-8'))
-            self.classify(s, p, o)
+            #self.classify(s, p, o)
             self.same(p, o, mapping['sameAs'])
             self.name_me(p, o, mapping['labels'])
             self.find_coordinates(p, o, mapping['coordinates'])
@@ -73,7 +85,7 @@ class ActiveEntity(Entity):
     def find_coordinates(self, pred, obj, coord_mapping):
         if pred in coord_mapping:
             self.type = 'place'
-            try: # fro all more complex matchings
+            try: # for all more complex matchings
                 regex = re.compile(coord_mapping[pred].get('regex'))
                 group = coord_mapping[pred].get('groups')
                 match = regex.match(obj)
@@ -101,7 +113,7 @@ def bagify(data):
     * [LIST]: a list containing all subject- and object-URIs
     """
     bag = dict()
-    graph = parse_rdf_source(data)
+    graph = read_rdf(data)
     if graph:
         all_uris = collect_uris(graph)
         bag['original-count'] = len(all_uris)
@@ -137,7 +149,7 @@ def http_lookup(url, headers, mapping_dict):
     #print request.status_code
     if 200 >= r.status_code <= 299 and 'application/rdf+xml' in r.content_type:
         #print r.target + ' > status-code: ' + str(r.status_code) + ' > content: ' + r.content_type
-        graph = parse_rdf_source(r.content)
+        graph = read_rdf(r.content)
         entity = ActiveEntity(url)
         entity.identify(graph, mapping_dict)
         return entity
@@ -181,7 +193,7 @@ def parse_rdf_file(file_path):
     graph = rdflib.Graph()
     # guess the files format and build the graph
     result = False
-    print 'test'
+    #print 'test'
     try:
         rdf_format = rdflib.util.guess_format(file_path)
         result = graph.parse(file_path, format=rdf_format)
@@ -195,9 +207,18 @@ def parse_rdf_file(file_path):
     return result
 
 
-def parse_rdf_source(source):
-    #print type(source)
+def read_rdf(source):
+    """
+    evaluates if RDF source is file or string.
+    If the Source is a string a temporary file will be created rdflib.parse() can read from.
     
+    ARG:
+    * source: path of a source
+    RETURNS:
+    * rdf.lib.Graph: Success -> a RDF-Graph-Object is returned
+    * False (bool): An Error occured while parsing
+    """
+    #print type(source)
     if os.path.isfile(source) and not os.path.isdir(source):
         return parse_rdf_file(source)
     else:
@@ -213,16 +234,21 @@ def parse_rdf_source(source):
     
 
 def request(uri, headers=False):
+    #print 'URI: ' + uri
     response = ''
     if not headers:
         response = requests.get(uri)
     else:
         response = requests.get(uri, headers=headers)
     
-    encoding = response.encoding
+    
     status_code = response.status_code
     response_header = response.headers
     content_type = response_header.get('content-type')
+    encoding = response.encoding
+    if encoding == None:
+        print '[geocold.request()]: Warning! No encoding specified by server. working with UTF-8'
+        encoding = 'UTF-8'
     content = response.text.encode(encoding)
 
     resp = Response(status_code, response_header, content)
@@ -242,64 +268,83 @@ requests HTTP-Lib
 * Documentation: http://docs.python-requests.org/en/master/
 """
 
+headers = {
+    'user-agent': 'GeoCoLD/0.0.1',
+    'Accept' : 'application/rdf+xml'
+    }
+
+GEO = rdflib.Namespace('http://www.opengis.net/ont/geosparql#')
+GNDO = rdflib.Namespace('http://d-nb.info/standards/elementset/gnd#')
+GN = rdflib.Namespace('http://www.geonames.org/ontology#')
+OWL = rdflib.Namespace('http://www.w3.org/2002/07/owl#')
+WG84 = rdflib.Namespace('http://www.w3.org/2003/01/geo/wgs84_pos#')
+
+
+mapping = {
+    'labels' : [
+        GNDO.preferredNameForThePlaceOrGeographicName, 
+        GN.name
+        ],
+    'coordinates' : {
+        GEO.asWKT : {
+            'regex' : r'Point \(\s?(\+[\d.]+)\s(\+[\d.]+)\s?\)',
+            'groups': ['long', 'lat']
+            },
+        WG84.lat  : 'lat',
+        WG84.long : 'long'
+        },
+    'sameAs' : [OWL.sameAs]
+    }
+
+uris = [        
+    'http://d-nb.info/gnd/4021477-1',
+    'http://d-nb.info/gnd/4007879-6',
+    'http://xmlns.com/foaf/0.1/Organization', 
+    'http://d-nb.info/gnd/118789708',
+    'http://worldcat.org/entity/work/id/4327837',
+    'http://d-nb.info/gnd/4324745-3',
+    'http://vocab.deri.ie/orca#Source',
+    'http://sws.geonames.org/2918632',
+    'http://sws.geonames.org/2867613',
+    'http://www.wikidata.org/wiki/Q17515838'
+    ]
+
 
 def testing():
     #Simple testing area
 
-    uri = 'http://d-nb.info/gnd/4021477-1'
+    uri_list = ['http://sws.geonames.org/2918632']
 
-    g = rdflib.Graph()
-    test = g.parse(uri)
-    for s,p,o in test:
-        print s,p,o
-    
-    print len(g)
-    
+    rdf_type = rdflib.URIRef('http://www.w3.org/1999/02/22-rdf-syntax-ns#type')
 
+
+    for uri in uri_list:
+        resp = request(uri, headers=headers)
+        graph = read_rdf(resp.content)
+        for s, p, o in graph:
+            print s, p , o
+
+        if (rdflib.URIRef(uri), rdf_type, None):
+            print uri
+            print 'JA, diese Uri hat einen typ'
+        #for s,p,o in graph.triples( (rdflib.URIRef(uri), rdf_type, None) ):
+        #    print s, o
+        
+        fail = True
+        for obj_class in graph.objects( rdflib.URIRef(uri), rdf_type ):
+            fail = obj_class
+            print "uri is a %s"%obj_class
+        
+        if fail:
+           for obj_class in graph.objects( rdflib.URIRef(uri+'/'), rdf_type ):
+            fail = obj_class
+            print "uri is a %s"%obj_class 
+        
+def full_test():
+    pass
 
 def main():
-    headers = {
-            'user-agent': 'GeoCoLD/0.0.1',
-            'Accept' : 'application/rdf+xml'
-            }
-
-    GEO = rdflib.Namespace('http://www.opengis.net/ont/geosparql#')
-    GNDO = rdflib.Namespace('http://d-nb.info/standards/elementset/gnd#')
-    GN = rdflib.Namespace('http://www.geonames.org/ontology#')
-    OWL = rdflib.Namespace('http://www.w3.org/2002/07/owl#')
-    WG84 = rdflib.Namespace('http://www.w3.org/2003/01/geo/wgs84_pos#')
-
-
-    mapping = {
-        'labels' : [
-            GNDO.preferredNameForThePlaceOrGeographicName, 
-            GN.name
-            ],
-        'coordinates' : {
-            GEO.asWKT : {
-                'regex' : r'Point \(\s?(\+[\d.]+)\s(\+[\d.]+)\s?\)',
-                'groups': ['long', 'lat']
-                },
-            WG84.lat  : 'lat',
-            WG84.long : 'long'
-            },
-        'sameAs' : [OWL.sameAs]
-        }
-    
-    uris = [
-        'http://d-nb.info/gnd/4021477-1',
-        'http://d-nb.info/gnd/4007879-6', 
-        'http://d-nb.info/gnd/118789708',
-        'http://worldcat.org/entity/work/id/4327837',
-        'http://d-nb.info/gnd/4324745-3',
-        'http://vocab.deri.ie/orca#Source',
-        'http://sws.geonames.org/2918632',
-        'http://sws.geonames.org/2867613',
-        'http://www.wikidata.org/wiki/Q17515838'
-        ]
-    
-    
-    
+       
     liste = list()
     for uri in uris:
         result = http_lookup(uri, headers, mapping)
@@ -328,7 +373,7 @@ def main():
     
     if 200 >= r.status_code <= 299 and 'application/rdf+xml' in r.content_type:
         #print r.target + ' with ' + str(r.status_code) + ' as ' + r.content_type
-        graph = parse_rdf_source(r.content)
+        graph = read_rdf(r.content)
         print_graph(graph)
     """
     

@@ -2,8 +2,9 @@
 {% block content %}
 
 <div id="map" class="container-fluid"></div>
+
 <div id="mapsite" class="content container-fluid">
-      <h2>Analysis</h2>
+      <h2>Result</h2>
       <div class="row">
         <div class="col-md-6">
           <div class="panel panel-success">
@@ -11,27 +12,49 @@
               <h3 class="panel-title">Identified Places</h3>
             </div>
             <div class="panel-body">
+              <ul class="list-group" id="id-places">
+                <!--
+                <li class="list-group-item">
+                  Göttingen
+                  <ul class="list-unstyled" style="margin-top:10px;">
+                    <li>
+                      <i class="fa fa-home" aria-hidden="true" style="margin-right: 10px"></i>
+                      <span><a href="#">URI</a></span>
+                    </li>
+                    <li>
+                      <i class="fa fa-map-marker" aria-hidden="true" style="margin-right: 10px"></i>
+                      <span>Koordinaten</span>
+                      <button class="marker-button" data-marker="asas">test</button>
+                    </li>
+                  </ul>
+                </li>
+
+                <li class="list-group-item">Dapibus ac facilisis in</li>
+                -->
+              </ul>
+              <!--
               <table id="identified" class="table table-condensed table-striped">
                 <tr>
                   <th>prefered label</th>
                   <th>URI</th>
                   <th>coordinates</th>
                 </tr>
-                <!--
+                <!-/-
                 <tr>
                   <td>1</td>
                   <td>Test</td>
                   <td>Test</td>
                 </tr>
-                -->
+                -/->
               </table>
+              -->
             </div>
           </div>  
         </div>
         <div class="col-md-6">
           <div class="panel panel-warning">
             <div class="panel-heading">
-              <h3 class="panel-title">Unidentifyed Entities</h3>
+              <h3 class="panel-title">Unidentified URIs</h3>
             </div>
             <div class="panel-body">
               <table id="unknown" class="table table-condensed table-striped">
@@ -53,25 +76,57 @@
       </div>
       <h2>Set a mark!</h2>
       <button onclick="test()" type="button" class="btn btn-default">DER Kuhberg</button>
+      <button onclick="setMapMarker()" type="button" class="btn btn-default">Mark</button>
     </div>
 
     <script type="text/javascript" language="javascript" src="{{ url_for('static', filename='js/map.js') }}"></script>
-    <script type="text/javascript" language="javascript" src="{{ url_for('static', filename='js/main.js') }}"></script>
-
-    
     <script type="text/javascript" language="javascript">
+      
+      // Posts the data to /lookup
+      let lookup = function (input, list) {
+          console.log('calling lookup ...')
+          $.ajax({
+              type: "POST",
+              url: "/lookup",
+              data: { url: input },
+              crossDomain: true,
+              success: function (response, list) {
+                console.log('AJAX received response from lookup:')
+                console.log(response);
+                plotter(response, list);
+              }
+          });
+      };
+
+
       $(document).ready(function () {
-          
+
+          // fetch data from POST and JSONfy
           let data = '{{ data|tojson }}'
           let json_data = JSON.parse(data)
-          
-          console.log('mapsite is running ...')
-          console.log(data)
+          console.log('received POST data:')
           console.log(json_data)
           
           // initialise GeoCoLD
-          initGeoCoLD();
+          initMap();
           
+          // select the individual URIs to be looked up 
+          let individuals = json_data['individuals'] 
+          //console.log(individuals)
+          
+          console.log('start lookup ...')
+          
+          
+          for (let i = 0; i < individuals.length; i++) {
+            //console.log(individuals[i])
+            let list = [individuals[i]]
+            for (let j = 0; j < list.length; j++){
+              lookup(JSON.stringify(list[j]));
+            };
+          };
+          
+          
+          /*
           // testlist of uris
           json_list = [
               "http://sws.geonames.org/2867613", 
@@ -83,10 +138,10 @@
               "http://www.fontane-notizbuecher.de/pers.xml#Bossart"];
           json_list2 = ["http://d-nb.info/gnd/4007879-6"];
           //postData('http://d-nb.info/gnd/4021477-1')
-          
-          postData(JSON.stringify(json_list));
-
+          //postData(JSON.stringify(json_list));
+          */
       });
+
     </script>
     
     
