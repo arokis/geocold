@@ -6,8 +6,8 @@ let mindex = {}
 
 function initMap(){
 	console.log('initialising Map ...');
-	map=new mr.Map(document.getElementById("map"));  //dom element
-	var center=new mr.LatLng(0,0);  //latitude, longitude
+	map = new mr.Map(document.getElementById('map'));
+	var center = new mr.LatLng(0,0);  //latitude, longitude
 	map.centerAndZoom(new mr.LatLng(35, 25),2.5); //1.5 = zoomlevel
 	
 	/*
@@ -18,8 +18,11 @@ function initMap(){
 		title:'ghjg'
 	});*/
 
-	// testmarker with GeoCoLD Pin
-	let marker = geocoldMarker('test', 50.875311, 0.351563);
+	// testmarker with GeoCoLD Pin - moveable
+	//marker = geocoldMarker('test', 51.875311, 0.351563);
+	//let marker2 = geocoldMarker('test', 50.875311, 0.351563);
+
+	
 	console.log('successfully initialised!');
 };
 
@@ -63,6 +66,7 @@ let test = function() {
 	kuh.registerToDict(mindex);
 	kuh.setMarker();
 	kuh.setEntry('#identified tbody');
+	//marker2 = geocoldMarker('test', 50.875311, 0.351563);
 };
 
 
@@ -165,7 +169,8 @@ let customMarker = function(label, lat, long, stuff) {
 #		Classes				 #
 ******************************
 
-- Geo(): a GEOCOLD JavaScript Geo-Object-Representation 
+- Geo(): a GEOCOLD JavaScript Geo-Object-Representation
+- Loading(): Geocold Loading-Bar refreshing the request status
 
 ******************************/
 
@@ -252,3 +257,43 @@ function Geo(obj){
 		$(element_id).append(item);
 	};
 };
+
+
+function Loading(total){
+	this.n = 1;
+	this.total = total
+	this.bar = '#gc-lookup'
+	this.current = 0;
+
+	this.create_bar = function(parent) {
+		let par_div = document.createElement('div');
+		$(par_div).attr('class', 'progress');
+		$(par_div).css('height', '3px');
+		$(par_div).append('<div id="gc-lookup" class="progress-bar progress-bar-warning" role="progressbar" style="width: 0%;color: black;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">0%</div>');
+		$(parent).append(par_div);
+	};
+
+	this.refresh = function() {
+		// Kehrwert mal 100 
+		this.current = (this.n / this.total) * 100;
+		console.log(this.current + ' % done');
+		this.process();
+		this.n += 1;
+	};
+
+	this.process = function () {
+		let percentage = Math.round(this.current) + '%';
+		$(this.bar).css('width', percentage);
+		$(this.bar).text(this.n + ' / ' + this.total + ' done (' + percentage + ')');
+		if (this.current == 100) {
+			$(this.bar).removeClass('progress-bar-warning');
+			$(this.bar).addClass('progress-bar-success'); 
+			console.log(this.current);
+			//this.kill();
+		};
+	};
+
+	this.kill = function () {
+		$(this.bar).remove();
+	};
+}; 

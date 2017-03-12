@@ -17,4 +17,3 @@ function callbackFunc(response) {
     //console.log(response);
     plottResponse(response);
 }
-    

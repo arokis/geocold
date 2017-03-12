@@ -199,21 +199,22 @@ def parse_rdf_file(file_path):
         result = graph.parse(file_path, format=rdf_format)
     except AttributeError:
         try:
-            #print ('[GeoCoLD:RDF-PARSING]: Error in guessing format. Working on default (application/rdf+xml)!')
+            #print ('[GEOCOLD:RDF-PARSING]: Error in guessing format. Working on default (application/rdf+xml)!')
             result = graph.parse(file_path)
         except SAXParseException:
-            print "[GEOCOLD:ERROR] in parse_rdf_file(): SAXParseException was raised. File is not a valid xml file!"
+            print "[GEOCOLD:RDF-PARSING] in parse_rdf_file(): SAXParseException was raised. File is not a valid xml file!"
             pass
     return result
 
 
 def read_rdf(source):
     """
-    evaluates if RDF source is file or string.
+    evaluates whether RDF source is file or string.
     If the Source is a string a temporary file will be created rdflib.parse() can read from.
     
     ARG:
     * source: path of a source
+    
     RETURNS:
     * rdf.lib.Graph: Success -> a RDF-Graph-Object is returned
     * False (bool): An Error occured while parsing
@@ -247,7 +248,7 @@ def request(uri, headers=False):
     content_type = response_header.get('content-type')
     encoding = response.encoding
     if encoding == None:
-        print '[geocold.request()]: Warning! No encoding specified by server. working with UTF-8'
+        print '[GEOCOLD:REQUEST] Warning! No encoding specified by server. working with UTF-8'
         encoding = 'UTF-8'
     content = response.text.encode(encoding)
 

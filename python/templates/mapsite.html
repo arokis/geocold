@@ -1,7 +1,11 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div id="map" class="container-fluid"></div>
+
+<div class="content container-fluid map-container">
+  <div id="map"></div>
+  <div id="geocold-lookup"></div>  
+</div>
 
 <div id="mapsite" class="content container-fluid">
       <h2>Result</h2>
@@ -83,17 +87,25 @@
     <script type="text/javascript" language="javascript">
       
       // Posts the data to /lookup
-      let lookup = function (input, list) {
+      let lookup = function (input, obj) {
           console.log('calling lookup ...')
           $.ajax({
               type: "POST",
               url: "/lookup",
               data: { url: input },
               crossDomain: true,
-              success: function (response, list) {
+              success: function (response) {
                 console.log('AJAX received response from lookup:')
                 console.log(response);
-                plotter(response, list);
+                plotter(response);
+                obj.refresh();
+                
+                //console.log(obj.n)
+              },
+              error : function (err) {
+                obj.refresh();
+                console.log('ERROR on ' + input);
+                console.log(err);
               }
           });
       };
@@ -116,12 +128,15 @@
           
           console.log('start lookup ...')
           
+          let call = new Loading(individuals.length);
+          call.create_bar('#geocold-lookup');
+          
           
           for (let i = 0; i < individuals.length; i++) {
-            //console.log(individuals[i])
+            console.log(individuals[i])
             let list = [individuals[i]]
             for (let j = 0; j < list.length; j++){
-              lookup(JSON.stringify(list[j]));
+              lookup(JSON.stringify(list[j]), call);
             };
           };
           
