@@ -52,7 +52,14 @@ let plotter = function (item) {
 
 let setUnknown = function (entity) {
 	let uri = entity['uri'];
-	$('#unknown tbody').append('<tr><td><a href="'+uri+'">'+uri+'</a> <sub>(class: <a href="' + entity['cls'] + '">' + entity['cls'] + '</a>)</sub></td></tr>');
+	
+	let classes = undefined
+	if (entity.hasOwnProperty('cls')) {
+		classes = entity['cls'];
+		console.log('WHAHAHAH' + classes); 
+	};
+	
+	$('#unknown tbody').append('<tr><td><a href="'+uri+'">'+uri+'</a> <sub>(class: <a href="' + classes + '">' + classes + '</a>)</sub></td></tr>');
 };
 
 

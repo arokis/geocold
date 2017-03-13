@@ -123,10 +123,14 @@ def lookup():
         if isinstance(input_url, list):
             out_list = list()
             for url in input_url:
-                out_list.append(geocold.http_lookup(url, headers, mapping).__dict__)
+                lookup = geocold.Request(headers=headers)
+                entity = lookup.web_lookup(url, mapping_dict=mapping)
+                out_list.append(entity.__dict__)
             output = json.dumps(out_list)
         else:
-            output = json.dumps(geocold.http_lookup(input_url, headers, mapping).__dict__)
+            lookup = geocold.Request(headers=headers)
+            entity = lookup.web_lookup(input_url, mapping_dict=mapping)
+            output = json.dumps(entity.__dict__)
 
         print output
         #resp = make_response('{"response": ' + output + '}')

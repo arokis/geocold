@@ -16,91 +16,11 @@ import requests
 import rdflib
 from rdflib.namespace import RDF
 
-class Response():
-     def __init__(self, status, header, content):
-         self.status_code = status
-         self.response_header = header
-         self.content = content 
-         self.content_type = header.get('content-type')
 
-
-class Entity():
-    def __init__(self, uri):
-        self.uri = uri
-        self.type = 'unknown'
-
-    
-class SilentEntity(Entity):
-    status = 'inactive'
-
-    def __init__(self, uri):
-        Entity.__init__(self, uri)
-        
-
-class ActiveEntity(Entity):
-    status = 'active'
-
-    def __init__(self, uri):
-        Entity.__init__(self, uri)
-        self.sameAs = list()
-        self.cls = list()
-    
-    def classify(self, graph):
-        uri = self.uri
-        if (uri, RDF.type, None):
-            fail = True
-            for obj_class in graph.objects( rdflib.URIRef(uri), RDF.type ):
-                fail = obj_class
-                self.cls = str(obj_class)
-            if fail: # check for trailing slash like in geonames-data
-                for obj_class in graph.objects( rdflib.URIRef(uri+'/'), RDF.type ):
-                    fail = obj_class
-                    self.cls = str(obj_class)
-        else: # bruteforcing all rdf:types and objects
-            for s, p, o in graph:
-                print s
-                if self.uri in s and p == RDF.type:
-                    self.cls.append({str(s) : o})
-
-    def identify(self, graph, mapping):
-        #self.mapping = mapping
-        coordinates = [key for key in mapping['coordinates']]
-        self.classify(graph)
-        for s,p,o in graph:
-            #print s,p,o
-            o = str(o.encode('utf-8'))
-            #self.classify(s, p, o)
-            self.same(p, o, mapping['sameAs'])
-            self.name_me(p, o, mapping['labels'])
-            self.find_coordinates(p, o, mapping['coordinates'])
-            
-    def name_me(self, pred, obj, mapping):
-        if pred in mapping:
-            self.label = obj
-
-    def same(self, pred, obj, same):
-        if pred in same:
-            self.sameAs.append(obj) 
-
-    def find_coordinates(self, pred, obj, coord_mapping):
-        if pred in coord_mapping:
-            self.type = 'place'
-            try: # for all more complex matchings
-                regex = re.compile(coord_mapping[pred].get('regex'))
-                group = coord_mapping[pred].get('groups')
-                match = regex.match(obj)
-                
-                if match:
-                    setattr(self, group[0], match.group(1))
-                    setattr(self, group[1], match.group(2))
-                else: 
-                    self.coordinates = obj
-                
-            except: # if no regex is provided then we will deal with single properties and simple mappings
-                value = coord_mapping[pred]
-                setattr(self, value, obj)
-                
-
+###################################
+#       Geocold - Functions       #  
+#       *******************       #
+###################################
 
 def bagify(data):
     """
@@ -142,23 +62,6 @@ def collect_uris(graph):
         if not isinstance(o, rdflib.term.Literal):
             bag.append(str(o))
     return bag
-
-
-def http_lookup(url, headers, mapping_dict):
-    r = request(url, headers=headers)
-    #print request.status_code
-    if 200 >= r.status_code <= 299 and 'application/rdf+xml' in r.content_type:
-        #print r.target + ' > status-code: ' + str(r.status_code) + ' > content: ' + r.content_type
-        graph = read_rdf(r.content)
-        entity = ActiveEntity(url)
-        entity.identify(graph, mapping_dict)
-        return entity
-    else:
-        silent_entity = SilentEntity(url)
-        silent_entity.type = 'silent'
-        silent_entity.status_code = r.status_code
-        #silent_entity.content_type = r.content_type
-        return silent_entity
 
 
 def individuate(array):
@@ -232,29 +135,175 @@ def read_rdf(source):
         output = parse_rdf_file(tmp)
         tmp.close()
         return output
-    
 
-def request(uri, headers=False):
-    #print 'URI: ' + uri
-    response = ''
-    if not headers:
-        response = requests.get(uri)
-    else:
-        response = requests.get(uri, headers=headers)
-    
-    
-    status_code = response.status_code
-    response_header = response.headers
-    content_type = response_header.get('content-type')
-    encoding = response.encoding
-    if encoding == None:
-        print '[GEOCOLD:REQUEST] Warning! No encoding specified by server. working with UTF-8'
-        encoding = 'UTF-8'
-    content = response.text.encode(encoding)
 
-    resp = Response(status_code, response_header, content)
-    resp.target = uri
-    return resp
+######################################################
+#       Geocold - Classes                            #
+#       *****************                            #
+# - Request(): Wrapper-Class for requests-lib.       #   
+#                                                    #
+# - Entity() > SilentEntity() | ActiveEntity():      #
+#   The Geocold-representation of Entitys incl.      #
+#   RDF-parsing, graph-traversion,                   #
+#   entity-identification etc.                       #
+#                                                    #   
+######################################################
+
+#+++++++++++++++#
+#   Request     #
+#+++++++++++++++#
+class Request():
+    """
+    """
+    def __init__(self, headers=False):
+        self.url = None
+        self.okay = False
+        self.request_headers = headers
+        self.content = None
+        self.content_type = None
+        self.redirects = None
+    
+    def get(self, url):
+        """
+        gathers the responded data, like instance.content if the url is not a bad request or the instance.content_type
+        """
+        self.url = url
+        response = ''
+        if not self.request_headers:
+            response = requests.get(url)
+        else: 
+            response = requests.get(url, headers=self.request_headers)
+
+        self.okay = self.__eval_status(response)
+        self.redirects = [redirect.url for redirect in response.history]
+        self.content_type = response.headers.get('content-type')
+        self.status_code = response.status_code
+        if self.okay:
+            self.content = self.__get_content(response)
+        # requests-lib API to interface the response object if needed
+        return response
+
+    def database_lookup(self, uri):
+        """
+        looks up the uri in a database-dump
+        """
+        pass
+
+    def web_lookup(self, url, mapping_dict):
+        """
+        looks up the uri on the web
+        """
+        self.get(url) 
+        if self.okay and 'application/rdf+xml' in self.content_type:
+            graph = read_rdf(self.content)
+            entity = ActiveEntity(url)
+            entity.identify(graph, mapping_dict)
+            return entity
+        else:
+            #print 'Resource is dead'
+            silent_entity = SilentEntity(url)
+            silent_entity.type = 'silent'
+            silent_entity.status_code = self.status_code
+            #silent_entity.content_type = r.content_type
+            return silent_entity    
+
+    def __eval_status(self, response):
+        return response.status_code == requests.codes.ok 
+
+    def __get_content(self, response):
+        encoding = response.encoding
+        if encoding == None:
+            print '[GEOCOLD:REQUEST] Warning! No encoding specified by server. working with UTF-8'
+            encoding = 'UTF-8'
+        return response.text.encode(encoding)
+        
+
+#+++++++++++++++#
+#   Entity      #
+#+++++++++++++++#
+class Entity():
+    """
+    """
+    def __init__(self, uri):
+        self.uri = uri
+        self.type = 'unknown'
+
+    
+class SilentEntity(Entity):
+    """
+    """
+    status = 'inactive'
+
+    def __init__(self, uri):
+        Entity.__init__(self, uri)
+        
+
+class ActiveEntity(Entity):
+    """
+    """
+    status = 'active'
+
+    def __init__(self, uri):
+        Entity.__init__(self, uri)
+        self.sameAs = list()
+        self.cls = list()
+    
+    def classify(self, graph):
+        uri = self.uri
+        if (uri, RDF.type, None):
+            fail = True
+            for obj_class in graph.objects( rdflib.URIRef(uri), RDF.type ):
+                fail = obj_class
+                #print obj_class
+                self.cls.append(obj_class.encode('UTF-8'))
+            if fail: # check for trailing slash like in geonames-data
+                for obj_class in graph.objects( rdflib.URIRef(uri+'/'), RDF.type ):
+                    #fail = obj_class
+                    self.cls.append(obj_class.encode('UTF-8'))
+        else: # bruteforcing all rdf:types and objects
+            for s, p, o in graph:
+                print s
+                if self.uri in s and p == RDF.type:
+                    self.cls.append({s.encode('UTF-8') : o})
+
+    def identify(self, graph, mapping):
+        #self.mapping = mapping
+        coordinates = [key for key in mapping['coordinates']]
+        self.classify(graph)
+        for s,p,o in graph:
+            #print s,p,o
+            o = str(o.encode('utf-8'))
+            #self.classify(s, p, o)
+            self.same(p, o, mapping['sameAs'])
+            self.name_me(p, o, mapping['labels'])
+            self.find_coordinates(p, o, mapping['coordinates'])
+            
+    def name_me(self, pred, obj, mapping):
+        if pred in mapping:
+            self.label = obj
+
+    def same(self, pred, obj, same):
+        if pred in same:
+            self.sameAs.append(obj) 
+
+    def find_coordinates(self, pred, obj, coord_mapping):
+        if pred in coord_mapping:
+            self.type = 'place'
+            try: # for all more complex matchings
+                regex = re.compile(coord_mapping[pred].get('regex'))
+                group = coord_mapping[pred].get('groups')
+                match = regex.match(obj)
+                
+                if match:
+                    setattr(self, group[0], match.group(1))
+                    setattr(self, group[1], match.group(2))
+                else: 
+                    self.coordinates = obj
+                
+            except: # if no regex is provided then we will deal with single properties and simple mappings
+                value = coord_mapping[pred]
+                setattr(self, value, obj)
+
 
 
 #############################
@@ -272,6 +321,7 @@ requests HTTP-Lib
 headers = {
     'user-agent': 'GeoCoLD/0.0.1',
     'Accept' : 'application/rdf+xml'
+    #'Accept' : 'text/turtle'
     }
 
 GEO = rdflib.Namespace('http://www.opengis.net/ont/geosparql#')
@@ -311,7 +361,7 @@ uris = [
     ]
 
 
-def testing():
+def query():
     #Simple testing area
 
     uri_list = ['http://sws.geonames.org/2918632']
@@ -320,7 +370,9 @@ def testing():
 
 
     for uri in uri_list:
-        resp = request(uri, headers=headers)
+        resp = Request(headers=headers)
+        resp.get(uri)
+
         graph = read_rdf(resp.content)
         for s, p, o in graph:
             print s, p , o
@@ -340,25 +392,31 @@ def testing():
            for obj_class in graph.objects( rdflib.URIRef(uri+'/'), rdf_type ):
             fail = obj_class
             print "uri is a %s"%obj_class 
-        
-def full_test():
-    pass
 
 def main():
        
     liste = list()
     for uri in uris:
-        result = http_lookup(uri, headers, mapping)
+        request = Request(headers=headers)
+        entity = request.web_lookup(uri, mapping)
         try:
-            if result.type == 'unknown' and len(result.sameAs) > 0:
-                print 'NEUER VERSUCH MÖGLICH: (' + str(len(result.sameAs)) + ')'
-                print result.sameAs
-                print result.__dict__
-            elif result.type == 'place':
+            if entity.type == 'unknown' and len(entity.sameAs) > 0:
+                print 'NEUER VERSUCH MÖGLICH: (' + str(len(entity.sameAs)) + ')'
+                print entity.__dict__
+                print entity.sameAs
+                """
+                for i in entity.sameAs:
+                    print 'Checking ' + i + ' ...'
+                    next_request = Request(headers=headers)
+                    entity = next_request.web_lookup(i, mapping)
+                    print entity.__dict__
+                """
+            elif entity.type == 'place':
                 print 'IDENTIFIZIERT: '
-                print result.__dict__
+                print entity.__dict__
             else: 
-                print 'unbekannt: ' + result.uri
+                print 'unbekannt: ' + entity.uri
+                #print entity.__dict__
         except AttributeError:
             pass
 
@@ -377,8 +435,34 @@ def main():
         graph = read_rdf(r.content)
         print_graph(graph)
     """
-    
+
+
+def resp_test():
+    headers = {
+    'user-agent': 'GeoCoLD/0.0.1',
+    'Accept' : 'application/rdf+xml',
+    }
+
+    #uri = 'http://www.fontane-notizbuecher.de/places.xml#Auerstedt'
+    #uri = 'http://d-nb.info/gnd/4007879-6'
+    uri = 'http://sws.geonames.org/2918632'
+
+    req = Request(headers=headers)
+    entity = req.web_lookup(uri, mapping_dict=mapping)
+    #print req.__dict__
+    print entity.__dict__
+
+
 
 if __name__ == '__main__':
+    import time
+    start = time.time()
+
     main()
     #testing()
+    #query()
+    #resp_test()
+    
+
+    end = time.time()
+    print (end - start)
