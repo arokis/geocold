@@ -76,7 +76,7 @@ def collect_uris():
         #return render_template('uri.html', data=uri_bag)
         return render_template('mapsite.html', title=app_title, data=uri_bag)
     else:
-        print uri_bag
+        print(uri_bag)
         return render_template('rdf_input_form.html', error=uri_bag)
 
 
@@ -86,7 +86,7 @@ def lookup():
     if request.method == 'POST':
 
         input_url = json.loads(request.form['url'])
-        print input_url
+        print(input_url)
         #print type(input_url)
 
         headers = {
@@ -132,7 +132,7 @@ def lookup():
             entity = lookup.web_lookup(input_url, mapping_dict=mapping)
             output = json.dumps(entity.__dict__)
 
-        print output
+        print(output)
         #resp = make_response('{"response": ' + output + '}')
         resp = make_response( output )
         resp.headers['Content-Type'] = "application/json"
@@ -141,4 +141,3 @@ def lookup():
 
 if __name__ == '__main__':
     app.run(debug=True)
-    
