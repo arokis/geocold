@@ -14,15 +14,41 @@ html,body{
 	font: normal 'Cookie', cursive;
 }*/
 
+/*** SETTINGS Area ***/
 .settings {
-	background: #222; 
+	background: #222;
+	/*border: 1px solid #000;*/ 
 	border-radius: 0px 0px 3px 0px;
+	color: #fff;
 	filter: alpha(opacity=50); /* opacity for IE9 */
-	/*height: 94%;*/ 
-	/*width: 30%;*/ 
+	font-family: 'Open Sans',arial,sans-serif;
 	opacity: 0.75;
 	position: absolute; 
-	z-index: 9999;  	
+	z-index: 9999;  
+		
+}
+
+.settings-head{
+	font-size: 13px;
+}
+
+#settings-progress{
+	margin: 7px 0px;
+	margin-right: 20px;
+	padding: 3px 6px;
+	background: #474747;
+}
+
+#settings-toggler {
+	padding: 12px 12px;
+	position:absolute; 
+	right:0px;
+	top:0px; 
+}
+
+#settings-toggler:hover{
+	color: #AAAAAA;
+	cursor:pointer;
 }
 
 .settings .panel-body{
@@ -30,22 +56,7 @@ html,body{
 	height: 200px;
 }
 
-.settings-head{
-	color: #ffffff !important;
-}
-
-.settings-progress{
-	padding: 6px 12px;
-}
-
-.settings-toggle a{
-	color: #ffffff;
-}
-
-.settings-toggle a:hover{
-	color: #AAAAAA;
-}
-
+/*** MAP Area ***/
 .map-container{
     height:94%;
 	margin-top: -20px;

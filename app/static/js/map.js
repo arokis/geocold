@@ -88,9 +88,25 @@ $(document).on( 'click', '.marker-button', function() {
 
 });
 
-$(document).on( 'click', '.settings-toggle', function() {
+
+$(document).on( 'click', '#settings-toggler', function() {
 	//console.log('test')
-	$('.setting-panel').toggle(400);
+	let panel_status = $('.settings-panel').attr('aria-expanded');
+	console.log(panel_status)
+	
+	if(!panel_status){
+		console.log(panel_status)
+		//$('#settings-toggler').removeClass()
+		$(this).attr('class', 'fa fa-minus-circle')
+		console.log('expanded');
+	} else {
+		console.log(panel_status)
+		//$('#settings-toggler').removeClass()
+		$(this).attr('class', 'fa fa-plus-circle')
+		console.log('collapsed');
+	}
+	
+	//$('.setting-panel').toggle(400);
 
 });
 

@@ -5,13 +5,13 @@
 
 <div class="map-container">
     <div class="settings col-xs-12 col-md-3">
-      <div class="settings-head container-fluid">
-        <div id="progress-div" class="settings-progress col-md-9">100%</div>
-        <div class="settings-toggle col-md-3">
-          <a href="#" class="btn"><i id="settings-toggler" class="fa fa-plus-circle" aria-hidden="true"></i></a>
+      <div class="settings-head" style="height:auto;">
+        <div id="settings-progress">
+          100%
         </div>
+        <i id="settings-toggler" class="fa fa-plus-circle" aria-hidden="true" data-toggle="collapse" data-target=".settings-panel"></i>
       </div>
-      <div class="setting-panel">
+      <div class="settings-panel collapse in">
 
           <div class="panel panel-success">
             <div class="panel-heading">
@@ -99,7 +99,7 @@
           console.log('start lookup ...')
           
           let call = new Loading(individuals.length);
-          call.create_bar('#geocold-lookup', '#progress-load',  '#progress-div');
+          call.create_bar('#geocold-lookup', '#progress-load',  '#settings-progress');
           
           /*
           for (let i = 0; i < individuals.length; i++) {
