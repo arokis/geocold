@@ -6,6 +6,7 @@ install required libs:
 - pip install rdflib
 - pip install flask
 - pip install flask_cors
+- pip install requests
 
 ## running web-app
 To run the web-app you need to start the server first:
