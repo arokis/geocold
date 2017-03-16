@@ -76,7 +76,9 @@ let test = function() {
 	//marker2 = geocoldMarker('test', 50.875311, 0.351563);
 };
 
-
+//##########################################
+// Some click Events
+//##########################################
 // naive and just for testing;-)
 $(document).on( 'click', '.marker-button', function() {
 	//console.log('test')
@@ -85,6 +87,13 @@ $(document).on( 'click', '.marker-button', function() {
 	$(marker_id).toggle(400);
 
 });
+
+$(document).on( 'click', '.settings-toggle', function() {
+	//console.log('test')
+	$('.setting-panel').toggle(400);
+
+});
+
 
 /*****************************/
 /*		Markers				 */
@@ -269,14 +278,21 @@ function Geo(obj){
 function Loading(total){
 	this.n = 1;
 	this.total = total
-	this.bar = '#gc-lookup'
+	this.bar = undefined
+	this.display = undefined
 	this.current = 0;
 
-	this.create_bar = function(parent) {
+	this.create_bar = function(parent, barID, display = undefined) {
+		this.bar = barID
+		if (display == undefined) {
+			this.display = this.bar
+		} else {
+			this.display = display
+		};
 		let par_div = document.createElement('div');
 		$(par_div).attr('class', 'progress');
 		$(par_div).css('height', '3px');
-		$(par_div).append('<div id="gc-lookup" class="progress-bar progress-bar-warning" role="progressbar" style="width: 0%;color: black;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">0%</div>');
+		$(par_div).append('<div id="' + barID.replace('#', '') + '" class="progress-bar progress-bar-warning" role="progressbar" style="width: 0%;color: black;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>');
 		$(parent).append(par_div);
 	};
 
@@ -291,7 +307,7 @@ function Loading(total){
 	this.process = function () {
 		let percentage = Math.round(this.current) + '%';
 		$(this.bar).css('width', percentage);
-		$(this.bar).text(this.n + ' / ' + this.total + ' done (' + percentage + ')');
+		$(this.display).text(this.n + ' / ' + this.total + ' done (' + percentage + ')');
 		if (this.current == 100) {
 			$(this.bar).removeClass('progress-bar-warning');
 			$(this.bar).addClass('progress-bar-success'); 

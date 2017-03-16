@@ -14,7 +14,26 @@ app = Flask(__name__, static_url_path='/static')
 CORS(app)
 
 # https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-ii-templates
+
+@app.route("/test")
+#@crossdomain(origin='*')
+def test():
+    #POST = request.form['data']
+    app_title = 'Mapsite Test'
+    uris = {'individuals' : [
+        'http://d-nb.info/gnd/7688136-2',
+        'http://d-nb.info/gnd/4021477-1',
+        'http://d-nb.info/gnd/4007879-6', 
+        'http://d-nb.info/gnd/118789708',
+        'http://worldcat.org/entity/work/id/4327837',
+        'http://d-nb.info/gnd/4324745-3',
+        'http://vocab.deri.ie/orca#Source',
+        'http://sws.geonames.org/2918632',
+        'http://sws.geonames.org/2867613',
+        'http://www.wikidata.org/wiki/Q17515838'
+        ]}
     
+    return render_template('mapsite_test.html', title=app_title, data=uris)  
 
 @app.route("/")
 #@crossdomain(origin='*')

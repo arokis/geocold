@@ -168,10 +168,14 @@ class Request():
         gathers the responded data, like instance.content if the url is not a bad request or the instance.content_type
         """
         self.url = url
+        
         response = ''
         if not self.request_headers:
             response = requests.get(url)
         else: 
+            # small hack since d-nb-server can't cope with multiple Accept-formats
+            if 'http://d-nb.info' in self.url:
+                self.request_headers['Accept'] = 'application/rdf+xml'
             response = requests.get(url, headers=self.request_headers)
 
         self.okay = self.__eval_status(response)
@@ -453,12 +457,30 @@ def resp_test():
     print entity.__dict__
 
 
+def header_test():
+    headers = {
+    'user-agent': 'GeoCoLD/0.0.1',
+    'Accept' : 'application/rdf+xml;q=0.9, text/turtle;q=0.8'
+    }
+
+    #uri = 'http://www.fontane-notizbuecher.de/places.xml#Auerstedt'
+    #uri = 'http://d-nb.info/gnd/4007879-6'
+    uri = 'http://sws.geonames.org/2918632'
+
+    req = Request(headers=headers)
+    response = req.get(uri)
+    
+    print response.headers
+    print req.__dict__
+
+
 
 if __name__ == '__main__':
     import time
     start = time.time()
 
-    main()
+    header_test()
+    #main()
     #testing()
     #query()
     #resp_test()
