@@ -79,7 +79,7 @@ def individuate(array):
 
 def print_graph(graph):
     for s, p, o in graph:
-        print s,p,o.encode(sys.stdout.encoding, errors='replace')
+        print (s,p,o.encode(sys.stdout.encoding, errors='replace'))
 
 
 def parse_rdf_file(file_path):
@@ -98,14 +98,14 @@ def parse_rdf_file(file_path):
     result = False
     #print 'test'
     try:
-        rdf_format = rdflib.util.guess_format(file_path)
-        result = graph.parse(file_path, format=rdf_format)
+        #rdf_format = rdflib.util.guess_format(file_path)
+        result = graph.parse(file_path, format='application/rdf+xml')
     except AttributeError:
         try:
             #print ('[GEOCOLD:RDF-PARSING]: Error in guessing format. Working on default (application/rdf+xml)!')
             result = graph.parse(file_path)
         except SAXParseException:
-            print "[GEOCOLD:RDF-PARSING] in parse_rdf_file(): SAXParseException was raised. File is not a valid xml file!"
+            print ("[GEOCOLD:RDF-PARSING] in parse_rdf_file(): SAXParseException was raised. File is not a valid xml file!")
             pass
     return result
 
@@ -217,7 +217,7 @@ class Request():
     def __get_content(self, response):
         encoding = response.encoding
         if encoding == None:
-            print '[GEOCOLD:REQUEST] Warning! No encoding specified by server. working with UTF-8'
+            print ('[GEOCOLD:REQUEST] Warning! No encoding specified by server. working with UTF-8')
             encoding = 'UTF-8'
         return response.text.encode(encoding)
         
@@ -266,7 +266,7 @@ class ActiveEntity(Entity):
                     self.cls.append(obj_class.encode('UTF-8'))
         else: # bruteforcing all rdf:types and objects
             for s, p, o in graph:
-                print s
+                print (s)
                 if self.uri in s and p == RDF.type:
                     self.cls.append({s.encode('UTF-8') : o})
 
@@ -379,23 +379,23 @@ def query():
 
         graph = read_rdf(resp.content)
         for s, p, o in graph:
-            print s, p , o
+            print (s, p , o)
 
         if (rdflib.URIRef(uri), rdf_type, None):
-            print uri
-            print 'JA, diese Uri hat einen typ'
+            print (uri)
+            print ('JA, diese Uri hat einen typ')
         #for s,p,o in graph.triples( (rdflib.URIRef(uri), rdf_type, None) ):
         #    print s, o
         
         fail = True
         for obj_class in graph.objects( rdflib.URIRef(uri), rdf_type ):
             fail = obj_class
-            print "uri is a %s"%obj_class
+            print ("uri is a %s"%obj_class)
         
         if fail:
            for obj_class in graph.objects( rdflib.URIRef(uri+'/'), rdf_type ):
             fail = obj_class
-            print "uri is a %s"%obj_class 
+            print ("uri is a %s"%obj_class)
 
 def main():
        
@@ -405,9 +405,9 @@ def main():
         entity = request.web_lookup(uri, mapping)
         try:
             if entity.type == 'unknown' and len(entity.sameAs) > 0:
-                print 'NEUER VERSUCH MÖGLICH: (' + str(len(entity.sameAs)) + ')'
-                print entity.__dict__
-                print entity.sameAs
+                print ('NEUER VERSUCH MÖGLICH: (' + str(len(entity.sameAs)) + ')')
+                print (entity.__dict__)
+                print (entity.sameAs)
                 """
                 for i in entity.sameAs:
                     print 'Checking ' + i + ' ...'
@@ -416,10 +416,10 @@ def main():
                     print entity.__dict__
                 """
             elif entity.type == 'place':
-                print 'IDENTIFIZIERT: '
-                print entity.__dict__
+                print ('IDENTIFIZIERT: ')
+                print (entity.__dict__)
             else: 
-                print 'unbekannt: ' + entity.uri
+                print ('unbekannt: ' + entity.uri)
                 #print entity.__dict__
         except AttributeError:
             pass
@@ -427,7 +427,7 @@ def main():
         #print json.dumps(result.__dict__)
         #liste.append(result.__dict__)
     
-        print '###'
+        print ('###')
     #print liste
     
     """
@@ -454,7 +454,7 @@ def resp_test():
     req = Request(headers=headers)
     entity = req.web_lookup(uri, mapping_dict=mapping)
     #print req.__dict__
-    print entity.__dict__
+    print (entity.__dict__)
 
 
 def header_test():
