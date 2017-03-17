@@ -90,24 +90,14 @@ $(document).on( 'click', '.marker-button', function() {
 
 
 $(document).on( 'click', '#settings-toggler', function() {
-	//console.log('test')
 	let panel_status = $('.settings-panel').attr('aria-expanded');
-	console.log(panel_status)
-	
-	if(!panel_status){
-		console.log(panel_status)
-		//$('#settings-toggler').removeClass()
-		$(this).attr('class', 'fa fa-minus-circle')
-		console.log('expanded');
+	if(panel_status == 'true'){
+		$(this).removeClass('fa-plus-circle');
+		$(this).addClass('fa-minus-circle');
 	} else {
-		console.log(panel_status)
-		//$('#settings-toggler').removeClass()
-		$(this).attr('class', 'fa fa-plus-circle')
-		console.log('collapsed');
+		$(this).removeClass('fa-minus-circle');
+		$(this).addClass('fa-plus-circle');
 	}
-	
-	//$('.setting-panel').toggle(400);
-
 });
 
 
