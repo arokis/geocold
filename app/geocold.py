@@ -149,6 +149,7 @@ def read_rdf(source):
 #                                                    #   
 ######################################################
 
+
 #+++++++++++++++#
 #   Request     #
 #+++++++++++++++#
@@ -321,9 +322,11 @@ rdflib:
 requests HTTP-Lib
 * Documentation: http://docs.python-requests.org/en/master/
 """
+db = {
+    'user': 'uwe'
+    }
 
 headers = {
-    'user-agent': 'GeoCoLD/0.0.1',
     'Accept' : 'application/rdf+xml'
     #'Accept' : 'text/turtle'
     }
@@ -474,17 +477,55 @@ def header_test():
     print req.__dict__
 
 
+#+++++++++++++++#
+#   Geocold     #
+#+++++++++++++++#
+class Geocold():
+    """
+    Geocold-Class encapsulating all functionalities
+    IN WORK!
+    """
+    default_config = {
+        'name' : 'GeoCoLD',
+        'version': '0.0.1'
+        }
+
+    def __init__(self, config=default_config, db_config=None, mapping=None, headers=None):
+        self.config = config
+        self.db = db_config
+        self.mapping = mapping
+        self.request_headers = headers
+        if not self.request_headers.get('user-agent'):
+            self.request_headers['user-agent'] = '-'.join(( self.config.get('name'), self.config.get('version') ))
+        self.entities = list()
+
+    @classmethod
+    def from_config(cls, config):
+        dictionary = config
+        return cls()
+
+
+
+def cl():
+    
+    test = Geocold(db_config=db, mapping=mapping, headers=headers)
+    print (test.__dict__)
+
 
 if __name__ == '__main__':
     import time
     start = time.time()
 
-    header_test()
+    #header_test()
     #main()
     #testing()
     #query()
     #resp_test()
+    cl()
     
 
     end = time.time()
     print (end - start)
+
+
+
