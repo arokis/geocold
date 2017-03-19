@@ -24,8 +24,7 @@ html,body{
 	font-family: 'Open Sans',arial,sans-serif;
 	opacity: 0.75;
 	position: absolute; 
-	z-index: 9999;  
-		
+	z-index: 9999;
 }
 
 .settings-head{
@@ -51,9 +50,30 @@ html,body{
 	cursor:pointer;
 }
 
-.settings .panel-body{
+.settings-panel{
+	padding-bottom: 15px; 
+}
+.settings-panel .panel{
+	margin-bottom: 0px;
+	border: 0px solid #000;
+}
+
+.settings-panel .panel-heading{
+	background-color: #222;
+	border: 0px;
+	color: #fff;
+	opacity: 1.75;
+}
+
+.settings-panel .panel-body{
+	background: #474747;
 	overflow-y: scroll;
 	height: 200px;
+}
+
+#id-places li{
+	background: #222;
+	color: #fff;
 }
 
 /*** MAP Area ***/

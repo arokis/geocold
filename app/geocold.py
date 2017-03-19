@@ -15,6 +15,7 @@ import json
 import requests
 import rdflib
 from rdflib.namespace import RDF
+from werkzeug.http import parse_options_header
 
 
 ###################################
@@ -181,7 +182,8 @@ class Request():
 
         self.okay = self.__eval_status(response)
         self.redirects = [redirect.url for redirect in response.history]
-        self.content_type = response.headers.get('content-type')
+        content_type = response.headers.get('content-type')
+        self.content_type = parse_options_header(content_type)[0]
         self.status_code = response.status_code
         if self.okay:
             self.content = self.__get_content(response)
@@ -443,7 +445,7 @@ def main():
         print_graph(graph)
     """
 
-
+"""
 def resp_test():
     headers = {
     'user-agent': 'GeoCoLD/0.0.1',
@@ -475,7 +477,7 @@ def header_test():
     
     print response.headers
     print req.__dict__
-
+"""
 
 #+++++++++++++++#
 #   Geocold     #
@@ -485,31 +487,144 @@ class Geocold():
     Geocold-Class encapsulating all functionalities
     IN WORK!
     """
-    default_config = {
+    config = {
         'name' : 'GeoCoLD',
         'version': '0.0.1'
         }
+    
+    mapping = {
+        'labels' : [
+            'http://d-nb.info/standards/elementset/gnd#preferredNameForThePlaceOrGeographicName', 
+            'http://www.geonames.org/ontology#name'
+            ],
+        'coordinates' : {
+            'http://www.opengis.net/ont/geosparql#asWKT' : {
+                'regex' : r'Point \(\s?(\+[\d.]+)\s(\+[\d.]+)\s?\)',
+                'groups': ['long', 'lat']
+                },
+            'http://www.w3.org/2003/01/geo/wgs84_pos#lat'  : 'lat',
+            'http://www.w3.org/2003/01/geo/wgs84_pos#long' : 'long'
+            },
+        'sameAs' : ['http://www.w3.org/2002/07/owl#sameAs']
+        }
 
-    def __init__(self, config=default_config, db_config=None, mapping=None, headers=None):
+    headers = {
+    'user-agent': '-'.join(( config.get('name'), config.get('version') )),
+    'Accept' : 'application/rdf+xml;q=0.9, text/turtle;q=0.8'
+    }
+
+    def __init__(self, config=config, db_config=None, mapping=mapping, request_headers=headers):
+        """
+        primary init-method
+        """
         self.config = config
         self.db = db_config
         self.mapping = mapping
-        self.request_headers = headers
+        self.request_headers = request_headers
         if not self.request_headers.get('user-agent'):
             self.request_headers['user-agent'] = '-'.join(( self.config.get('name'), self.config.get('version') ))
         self.entities = list()
 
     @classmethod
     def from_config(cls, config):
+        """
+        secondary init-method to parse config.json
+        """
         dictionary = config
         return cls()
+
+    def db_lookup(self, request_headers=None):
+        pass
+
+    def web_lookup(self, request_headers=headers):
+        pass
+
+    def read_rdf(self, source):
+        """
+        evaluates whether RDF source is file or string.
+        If the Source is a string a temporary file will be created rdflib.parse() can read from.
+        
+        ARG:
+        * source: path of a source
+        
+        RETURNS:
+        * rdf.lib.Graph: Success -> a RDF-Graph-Object is returned
+        * False (bool): An Error occured while parsing
+        """
+        #print type(source)
+        if os.path.isfile(source) and not os.path.isdir(source):
+            mime = rdflib.util.guess_format(source)
+            print ('[GEOCOLD:RDF-SOURCE] reading RDF-data from file')
+            return Geocold.parse_rdf_file(source, mime)
+        else:
+            print ('[GEOCOLD:RDF-SOURCE] reading RDF-data from non-file source')
+            data = Request(headers=self.request_headers)
+            response = data.get(source)
+            mime = Geocold.mime_mapping(data.content_type)
+            tmp = tempfile.TemporaryFile()
+            tmp.write(data.content)
+            tmp.seek(0)
+            output = Geocold.parse_rdf_file(tmp, mime)
+            tmp.close()
+            return output
+
+    @staticmethod
+    def parse_rdf_file(file_path, serialisiation_format):
+        """
+        parses RDF-Data from file
+        
+        ARG:
+        * file_path: path to a file
+
+        RETURNS:
+        * rdf.lib.Graph: Success -> a RDF-Graph-Object is returned
+        * False (bool): An Error occured while parsing
+        """
+        print ('[GEOCOLD:RDF-PARSING] parsing RDF to Graph')
+        graph = rdflib.Graph()
+        result = False
+
+        try:
+            #rdf_format = rdflib.util.guess_format(file_path)
+            result = graph.parse(file_path, format=serialisiation_format)
+        except AttributeError:
+            try:
+                #print ('[GEOCOLD:RDF-PARSING]: Error in guessing format. Working on default (application/rdf+xml)!')
+                result = graph.parse(file_path, format=serialisiation_format)
+            except SAXParseException:
+                print ("[GEOCOLD:RDF-PARSING] in parse_rdf_file(): SAXParseException was raised. File is not a valid xml file!")
+                pass
+        return result
+
+    @staticmethod
+    def mime_mapping(mime):
+        """
+        mapps mime-types to rdflib-mimes
+        
+        ARG:
+        * mime: a mime-type
+
+        RETURNS:
+        * rdflib-mime-type
+        """
+        print mime
+        mime_map = {
+            'application/rdf+xml': 'application/rdf+xml',
+            'text/turle': 'n3'
+            }
+        result = mime_map.get(mime, 'application/rdf+xml')
+        print ('[GEOCOLD:RDF-MIME-MAPPING] mapping "' + mime + '" to rdflib-mime "' + result)
+        return result
+    
 
 
 
 def cl():
     
-    test = Geocold(db_config=db, mapping=mapping, headers=headers)
+    test = Geocold(db_config=db, mapping=mapping)
     print (test.__dict__)
+    test.read_rdf(uris[0])
+
 
 
 if __name__ == '__main__':

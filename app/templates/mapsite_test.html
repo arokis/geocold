@@ -13,7 +13,7 @@
       </div>
       <div class="settings-panel collapse">
 
-          <div class="panel panel-success">
+          <div class="panel panel-default">
             <div class="panel-heading">
               <h3 class="panel-title">Identified Places</h3>
             </div>
@@ -101,14 +101,14 @@
           let call = new Loading(individuals.length);
           call.create_bar('#geocold-lookup', '#progress-load',  '#settings-progress');
           
-          /*
+          
           for (let i = 0; i < individuals.length; i++) {
             console.log(individuals[i])
             let list = [individuals[i]]
             for (let j = 0; j < list.length; j++){
               lookup(JSON.stringify(list[j]), call);
             };
-          };*/
+          };
           
           
           /*
