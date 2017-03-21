@@ -18,7 +18,9 @@ from werkzeug.http import parse_options_header
 
 import entities as GeoEntities
 import request as GeoRequest
+import rdf_parser
 
+__all__ = ['Geocold']
 
 #+++++++++++++++#
 #   Geocold     #
@@ -157,30 +159,31 @@ class Geocold():
         #print source
         try:
             if os.path.isfile(source) and not os.path.isdir(source):
-                print ('[GEOCOLD:RDF-SOURCE] reading RDF-data from file ' + source)
-                mime = rdflib.util.guess_format(source)
-                print (mime)
-                return Geocold.parse_rdf_file(source, mime)
+                return rdf_parser.rdf_from_file(source)
             else:
                 print ('[GEOCOLD:RDF-SOURCE] reading RDF-data from non-file source ')
                 data = GeoRequest.Request()
                 response = data.get(source, headers=self.request_headers)
+                """
                 mime = Geocold.mime_mapping(data.content_type)
                 tmp = tempfile.TemporaryFile()
                 tmp.write(data.content)
                 tmp.seek(0)
                 output = Geocold.parse_rdf_file(tmp, mime)
                 tmp.close()
-                return output
+                """
+                return rdf_parser.rdf_from_data(data.content, mime=data.content_type)
         except TypeError:
                 print ('[GEOCOLD:RDF-SOURCE] reading RDF-data from Request-Object ')
+                """
                 mime = Geocold.mime_mapping(source.content_type)
                 tmp = tempfile.TemporaryFile()
                 tmp.write(source.content)
                 tmp.seek(0)
                 output = Geocold.parse_rdf_file(tmp, mime)
                 tmp.close()
-                return output
+                """
+                return rdf_parser.rdf_from_data(source.content, mime=source.content_type)
 
 
 
@@ -216,27 +219,6 @@ class Geocold():
         * [LIST]: a list with individual items
         """
         return list(OrderedDict.fromkeys(array))
-
-
-    @staticmethod
-    def mime_mapping(mime):
-        """
-        mapps mime-types to rdflib-mimes
-        
-        ARG:
-        * mime: a mime-type
-
-        RETURNS:
-        * rdflib-mime-type
-        """
-        print mime
-        mime_map = {
-            'application/rdf+xml': 'xml',
-            'text/turle': 'n3'
-            }
-        result = mime_map.get(mime, 'xml')
-        print ('[GEOCOLD:RDF-MIME-MAPPING] mapping "' + mime + '" to rdflib-mime "' + result + '"')
-        return result
 
 
     @staticmethod

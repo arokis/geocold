@@ -9,6 +9,7 @@ import re
 import rdflib
 from rdflib.namespace import RDF
 
+__all__ = ['Entity', 'SilentEntity', 'ActiveEntity']
 
 ######################################################
 #       Geocold - Classes                            #

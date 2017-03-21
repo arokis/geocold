@@ -7,6 +7,7 @@ import requests
 import rdflib
 
 import geocold
+#import geocold2
 from flask import Flask, request, render_template
 from flask import make_response
 from flask_cors import CORS
@@ -88,7 +89,8 @@ def mapsite():
 #@crossdomain(origin='*')
 def collect_uris():
     POST = request.form['rdf']
-    uri_bag = geocold.bagify(POST)
+    data = geocold.rdf_from_string(POST)
+    uri_bag = geocold.bagify(data)
     #print type(POST[0])
     if not 'error' in uri_bag:
         app_title = 'Mapsite'
@@ -97,7 +99,6 @@ def collect_uris():
     else:
         print(uri_bag)
         return render_template('rdf_input_form.html', error=uri_bag)
-
 
 @app.route("/lookup", methods=['POST'])
 #@crossdomain(origin='*')
@@ -139,16 +140,21 @@ def lookup():
 
 
         output = ''
+
+        gc = geocold.Geocold(mapping=mapping)
+        
         if isinstance(input_url, list):
             out_list = list()
             for url in input_url:
-                lookup = geocold.Request(headers=headers)
-                entity = lookup.web_lookup(url, mapping_dict=mapping)
+                entity = gc.web_lookup(url)
+                #lookup = geocold.Request(headers=headers)
+                #entity = lookup.web_lookup(url, mapping_dict=mapping)
                 out_list.append(entity.__dict__)
             output = json.dumps(out_list)
         else:
-            lookup = geocold.Request(headers=headers)
-            entity = lookup.web_lookup(input_url, mapping_dict=mapping)
+            #lookup = geocold.Request(headers=headers)
+            #entity = lookup.web_lookup(input_url, mapping_dict=mapping)
+            entity = gc.web_lookup(input_url)
             output = json.dumps(entity.__dict__)
 
         print(output)
