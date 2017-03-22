@@ -99,7 +99,7 @@ class Geocold():
         """
         print ('[GEOCOLD:BAGIFY] individuating URIs from graph ...')
         bag = dict()
-        if graph:
+        if isinstance(graph, rdflib.graph.Graph):
             all_uris = self.collect_uris(graph)
             bag['original-count'] = len(all_uris)
             unified_bag = self.individuate(all_uris)
@@ -107,7 +107,7 @@ class Geocold():
             return bag
         else:
             bag['error'] = {'source' : 'geocold.bagify', 'description' : 'Error while collecting uris. Check log-files!'}
-            return bag
+            return graph
 
 
     def lookup(self):
@@ -172,7 +172,7 @@ class Geocold():
                 output = Geocold.parse_rdf_file(tmp, mime)
                 tmp.close()
                 """
-                return rdf_parser.rdf_from_data(data.content, mime=data.content_type)
+                return rdf_parser.rdf_from_string(data.content, mime=data.content_type)
         except TypeError:
                 print ('[GEOCOLD:RDF-SOURCE] reading RDF-data from Request-Object ')
                 """
@@ -183,7 +183,7 @@ class Geocold():
                 output = Geocold.parse_rdf_file(tmp, mime)
                 tmp.close()
                 """
-                return rdf_parser.rdf_from_data(source.content, mime=source.content_type)
+                return rdf_parser.rdf_from_string(source.content, mime=source.content_type)
 
 
 
@@ -220,38 +220,6 @@ class Geocold():
         """
         return list(OrderedDict.fromkeys(array))
 
-
-    @staticmethod
-    def parse_rdf_file(file_path, serialisiation_format):
-        """
-        parses RDF-Data from file
-        
-        ARG:
-        * file_path: path to a file
-
-        RETURNS:
-        * rdf.lib.Graph: Success -> a RDF-Graph-Object is returned
-        * False (bool): An Error occured while parsing
-        """
-        print ('[GEOCOLD:RDF-PARSING] parsing RDF to Graph')
-        graph = rdflib.Graph()
-        result = False
-
-        try:
-            #rdf_format = rdflib.util.guess_format(file_path)
-            result = graph.parse(file_path, format=serialisiation_format)
-        except TypeError:
-            print ("[GEOCOLD:RDF-PARSING] TypeError was raised. No RDF!")
-            pass
-        except AttributeError:
-            try:
-                #print ('[GEOCOLD:RDF-PARSING]: Error in guessing format. Working on default (application/rdf+xml)!')
-                result = graph.parse(file_path, format=serialisiation_format)
-            except SAXParseException:
-                print ("[GEOCOLD:RDF-PARSING] in parse_rdf_file(): SAXParseException was raised. File is not a valid xml file!")
-                pass
-        return result
-
     
     @staticmethod
     def extract_graphs(uris, source_graph):
@@ -268,10 +236,7 @@ class Geocold():
         return graph_list
 
 
-    @staticmethod
-    def print_graph(graph):
-        for s, p, o in graph:
-            print (s,p,o.encode(sys.stdout.encoding, errors='replace'))
+    
 
 
 

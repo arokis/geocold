@@ -89,8 +89,9 @@ def mapsite():
 #@crossdomain(origin='*')
 def collect_uris():
     POST = request.form['rdf']
-    data = geocold.rdf_from_string(POST)
-    uri_bag = geocold.bagify(data)
+    data = geocold.rdf_from_string(POST, "application/rdf+xml")
+    uri_bag = geocold.Geocold().bagify(data)
+    print uri_bag
     #print type(POST[0])
     if not 'error' in uri_bag:
         app_title = 'Mapsite'
