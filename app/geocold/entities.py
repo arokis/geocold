@@ -47,7 +47,7 @@ class Place(Entity):
         self.coordinates['lat'] = lat
         self.coordinates['long'] = long
     
-    def _set_coordinates(self, lat, long).
+    def _set_coordinates(self, lat, long):
         pass
 
     
