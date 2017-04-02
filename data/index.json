@@ -1,0 +1,20 @@
+{
+          "labels": [
+            "Hanover",
+            "Hannover"
+          ],
+          "coordinates": [
+            {
+              "lat": 52.37,
+              "long": 9.72
+            },
+            {
+              "lat": 52.424199,
+              "long": 9.704019
+            }
+          ],
+          "uris": [
+            "http://d-nb.info/gnd/4023349-2",
+            "https://www.wikidata.org/wiki/Q1715"
+          ]
+        }
