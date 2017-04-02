@@ -1,19 +1,23 @@
+//##########################################
+// Some click Events
+//##########################################
+// naive and just for testing;-)
+$(document).on( 'click', '.marker-button', function() {
+	//console.log('test')
+	let marker_id = '#' + $(this).attr('data-marker'); 
+	console.log( marker_id );
+	$(marker_id).toggle(400);
 
-// the AJAX Request Handling script
-function postData(input) {
-    console.log('calling lookup ...')
-    $.ajax({
-        type: "POST",
-        url: "/lookup",
-        data: { url: input },
-        crossDomain: true,
-        success: callbackFunc
-    });
-}
+});
 
 
-function callbackFunc(response) {
-    console.log('AJAX received response from lookup:')
-    //console.log(response);
-    plottResponse(response);
-}
+$(document).on( 'click', '#settings-toggler', function() {
+	let panel_status = $('.settings-panel').attr('aria-expanded');
+	if(panel_status == 'true'){
+		$(this).removeClass('fa-plus-circle');
+		$(this).addClass('fa-minus-circle');
+	} else {
+		$(this).removeClass('fa-minus-circle');
+		$(this).addClass('fa-plus-circle');
+	}
+});

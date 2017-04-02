@@ -35,6 +35,21 @@ class Entity():
         self.uri = uri
         self.type = 'unknown'
 
+
+class Place(Entity):
+    """
+    """
+    def __init__(self, uri, label, lat, long):
+        Entity.__init__(self, uri)
+        self.type = 'place'
+        self.label = label
+        self.coordinates = dict()
+        self.coordinates['lat'] = lat
+        self.coordinates['long'] = long
+    
+    def _set_coordinates(self, lat, long).
+        pass
+
     
 class SilentEntity(Entity):
     """
@@ -76,6 +91,7 @@ class ActiveEntity(Entity):
     def identify(self, graph, mapping):
         #self.mapping = mapping
         coordinates = [key for key in mapping['coordinates']]
+        self.coordinates = dict()
         self.classify(graph)
         for s,p,o in graph:
             #print s,p,o
@@ -84,6 +100,10 @@ class ActiveEntity(Entity):
             self.same(p, o, mapping['sameAs'])
             self.name_me(p, o, mapping['labels'])
             self.find_coordinates(p, o, mapping['coordinates'])
+        
+        # cleanup
+        if len(self.coordinates) == 0:
+            del self.coordinates
             
     def name_me(self, pred, obj, mapping):
         if pred in mapping:
@@ -102,14 +122,18 @@ class ActiveEntity(Entity):
                 match = regex.match(obj)
                 
                 if match:
-                    setattr(self, group[0], match.group(1))
-                    setattr(self, group[1], match.group(2))
+                    self.coordinates[group[0]] = match.group(1)
+                    self.coordinates[group[1]] = match.group(2)
+                    #setattr(self, group[0], match.group(1))
+                    #setattr(self, group[1], match.group(2))
                 else: 
                     self.coordinates = obj
                 
             except: # if no regex is provided then we will deal with single properties and simple mappings
                 value = coord_mapping[pred]
-                setattr(self, value, obj)
+                #print "EXCEPT: " + value + ' > ' + obj
+                self.coordinates[value] = obj
+                #setattr(self, value, obj)
 
 
 

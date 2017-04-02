@@ -1,8 +1,31 @@
 var mr=new Object(khtml.maplib);
 var map;
 let mindex = {}
-//let mindex2 = []
 
+
+// Posts the data to /lookup
+let lookup = function (input, obj) {
+	console.log('calling lookup ...')
+	$.ajax({
+		type: "POST",
+		url: "/lookup",
+		data: { url: input },
+		crossDomain: true,
+		success: function (response) {
+		console.log('AJAX received response from lookup:')
+		console.log(response);
+		plotter(response);
+		obj.refresh();
+		
+		//console.log(obj.n)
+		},
+		error : function (err) {
+		obj.refresh();
+		console.log('ERROR on ' + input);
+		console.log(err);
+		}
+	});
+};
 
 function initMap(){
 	console.log('initialising Map ...');
@@ -22,7 +45,6 @@ function initMap(){
 	//marker = geocoldMarker('test', 51.875311, 0.351563);
 	//let marker2 = geocoldMarker('test', 50.875311, 0.351563);
 
-	
 	console.log('successfully initialised!');
 };
 
@@ -66,8 +88,10 @@ let setUnknown = function (entity) {
 let test = function() {
 	let obj = {
 		'label' : 'Kuhberg',
-		'lat':	51.3,
-		'long': 9.4,
+		'coordinates' : {
+			'lat':	51.3,
+			'long': 9.4
+		}
 	};
 	let kuh = new Geo(obj);
 	kuh.registerToDict(mindex);
@@ -75,30 +99,6 @@ let test = function() {
 	kuh.setEntry('#identified tbody');
 	//marker2 = geocoldMarker('test', 50.875311, 0.351563);
 };
-
-//##########################################
-// Some click Events
-//##########################################
-// naive and just for testing;-)
-$(document).on( 'click', '.marker-button', function() {
-	//console.log('test')
-	let marker_id = '#' + $(this).attr('data-marker'); 
-	console.log( marker_id );
-	$(marker_id).toggle(400);
-
-});
-
-
-$(document).on( 'click', '#settings-toggler', function() {
-	let panel_status = $('.settings-panel').attr('aria-expanded');
-	if(panel_status == 'true'){
-		$(this).removeClass('fa-plus-circle');
-		$(this).addClass('fa-minus-circle');
-	} else {
-		$(this).removeClass('fa-minus-circle');
-		$(this).addClass('fa-plus-circle');
-	}
-});
 
 
 /*****************************/
@@ -201,8 +201,8 @@ function Geo(obj){
 	this.key = guidGenerator()
 	this.uri = obj['uri'];
 	this.label = obj['label'];
-	this.lat = obj['lat'];
-	this.long = obj['long'];
+	this.lat = obj['coordinates']['lat'];
+	this.long = obj['coordinates']['long'];
 	this.marker = false
 
 	this.registerToArray = function (array) {

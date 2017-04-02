@@ -59,6 +59,7 @@ html,body{
 }
 
 .settings-panel .panel-heading{
+	padding: 10px 0px;
 	background-color: #222;
 	border: 0px;
 	color: #fff;

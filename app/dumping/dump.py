@@ -42,6 +42,7 @@ def xml_from_string(data):
         }
     
     dump_obj['name'] = get_textnode(x, './/gn:name', ns)
+    dump_obj['alternative'] = get_textnode(x, './/gn:alternateName', ns)
     dump_obj['uri'] = get_attributenode(x, './/gn:Feature', '{http://www.w3.org/1999/02/22-rdf-syntax-ns#}about', ns)
     dump_obj['lat'] = get_textnode(x, './/wg84:lat', ns)
     dump_obj['long'] = get_textnode(x, './/wg84:long', ns)
@@ -126,6 +127,7 @@ def iter_dump(file_obj):
                 print xml    
             else:
                 print xml['uri'] + ' OKAY, errors so far: (' + str(error) + ')'
+                print xml
                 #with open("error.log", "a") as myfile:
                 #    myfile.write(xml['uri'] + ' OKAY\n')       
         except:
@@ -145,8 +147,9 @@ def main():
     #xml_string = read_gn_dump_range(path, 12000)
     #xml = xml_from_string(xml_string)
     #print xml_string
-    xml_data = read_xml('test.xml')
-    xml = xml_from_string(xml_data[0])
+    dump = read_gn_dump_range('dumps/all-geonames-rdf.txt', 50)
+    #xml_data = read_xml('test.xml')
+    xml = iter_dump(dump)
     print xml
     
     

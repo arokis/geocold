@@ -18,6 +18,9 @@
               <h3 class="panel-title">Identified Places</h3>
             </div>
             <div class="panel-body" style="overflow-y: scroll; height: 200px">
+              <div class="places-result">
+                test
+              </div>
               <ul class="list-group" id="id-places">
                 
               </ul>
@@ -56,29 +59,7 @@
     <script type="text/javascript" language="javascript" src="{{ url_for('static', filename='js/map.js') }}"></script>
     <script type="text/javascript" language="javascript">
       
-      // Posts the data to /lookup
-      let lookup = function (input, obj) {
-          console.log('calling lookup ...')
-          $.ajax({
-              type: "POST",
-              url: "/lookup",
-              data: { url: input },
-              crossDomain: true,
-              success: function (response) {
-                console.log('AJAX received response from lookup:')
-                console.log(response);
-                plotter(response);
-                obj.refresh();
-                
-                //console.log(obj.n)
-              },
-              error : function (err) {
-                obj.refresh();
-                console.log('ERROR on ' + input);
-                console.log(err);
-              }
-          });
-      };
+      
 
 
       $(document).ready(function () {

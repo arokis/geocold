@@ -376,8 +376,8 @@ if __name__ == '__main__':
     start = time.time()
 
     #main()
-    fontane()
-    #web()
+    #fontane()
+    web()
 
     end = time.time()
     print (end - start)
